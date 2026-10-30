@@ -43,7 +43,7 @@ export default function Hero() {
             id="hero-title"
             intro
             lines={portfolioIntro.title}
-            className="display relative text-[clamp(2.2rem,7.4cqw,6.2rem)]"
+            className="display relative text-[clamp(1.75rem,9.4cqw,3.4rem)] sm:text-[clamp(2.2rem,7.4cqw,6.2rem)]"
             lineClassName={(i) => (i === 1 ? 'text-orange-ink' : '')}
           >
             <HeadlineTags tags={TAGS} />
@@ -57,12 +57,14 @@ export default function Hero() {
 
       <div data-stage-avoid className="wrap relative z-10">
         <div className="mt-2 max-w-[30rem] pb-8 lg:mt-9 lg:pb-0 lg:max-w-[min(30rem,40vw)]">
-          <p data-intro-hide className="lede">
+          <p data-intro-hide className="lede max-sm:text-base">
             {home.lede}
           </p>
-          <div data-intro-hide className="mt-6 flex flex-wrap gap-3">
-            <Button href={home.ctas[0].href}>{home.ctas[0].label}</Button>
-            <Button href={home.ctas[1].href} variant="ghost">
+          <div data-intro-hide className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Button href={home.ctas[0].href} className="justify-between sm:justify-start">
+              {home.ctas[0].label}
+            </Button>
+            <Button href={home.ctas[1].href} variant="ghost" className="justify-between sm:justify-start">
               {home.ctas[1].label}
             </Button>
           </div>
