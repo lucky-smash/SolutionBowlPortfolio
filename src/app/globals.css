@@ -1,0 +1,439 @@
+@import "tailwindcss";
+
+/* `dark:` utilities follow the site's own toggle (html[data-theme="dark"]), not the OS setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ───────────────────────── Solution Bowl design tokens ─────────────────────────
+   Brand orange and grey are sampled from the official logo (public/brand/solution-bowl-logo.png).
+   Contrast (WCAG): ink on cream 14.9 · ink-2 on cream 5.8 · orange-deep on cream 4.8 (small text) ·
+   orange-ink on cream 3.1 (large display only) · ink on orange 6.95. */
+@theme {
+  --color-orange: #f58634; /* logo S — fills, panels, accents */
+  --color-orange-ink: #e35a12; /* large display type on cream */
+  --color-orange-deep: #b54208; /* small orange text on light surfaces */
+  --color-orange-soft: #fbd9bd;
+  --color-grey: #848688; /* logo B */
+  --color-cream: #f4ece0; /* page ground */
+  --color-cream-2: #ece2d3;
+  --color-paper: #fbf7f1;
+  --color-sand: #e3d6c3;
+  --color-ink: #1c1916;
+  --color-ink-2: #5e5b57;
+  --color-ink-3: #8c8680;
+  --color-night: #141210;
+  --color-ink-hover: #2c2723;
+  --color-orange-hover: #f7944b;
+  --color-night-hover: #221e1a;
+
+  --font-display: var(--font-clash), system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+:root {
+  --gutter: clamp(1.25rem, 0.55rem + 2.6vw, 3.5rem);
+  --max: 100rem;
+  --header-h: 5.25rem;
+  --section: clamp(5.5rem, 3.5rem + 7vw, 10rem);
+  --radius: 1.25rem;
+  --radius-lg: 2rem;
+  --line: color-mix(in oklab, var(--color-ink) 12%, transparent);
+  --line-strong: color-mix(in oklab, var(--color-ink) 22%, transparent);
+
+  /* Type scale */
+  --fs-mega: clamp(2.6rem, 0.6rem + 7.4vw, 8.75rem);
+  --fs-hero: clamp(2.4rem, 0.7rem + 5.8vw, 6.8rem);
+  --fs-h1: clamp(2.2rem, 0.9rem + 4.4vw, 5.4rem);
+  --fs-h2: clamp(2rem, 1rem + 3.4vw, 4.7rem);
+  --fs-h3: clamp(1.5rem, 1.05rem + 1.6vw, 2.5rem);
+  --fs-statement: clamp(1.6rem, 0.95rem + 2.5vw, 3.6rem);
+  --fs-lede: clamp(1.075rem, 0.98rem + 0.4vw, 1.375rem);
+
+  color-scheme: light;
+}
+
+/* ───────────────────────── Dark theme ─────────────────────────
+   The live solutionbowl.ai palette: navy grounds, orange #F25C2E accents. Set by <html data-theme="dark">
+   (ThemeToggle, restored before paint by the boot script in layout.tsx). The tokens keep their roles, so every
+   component follows: ink is the text colour, cream / paper the grounds.
+   Contrast (WCAG) on the page ground: ink 16 · ink-2 8.6 · ink-3 5.8 · orange 5.2 · orange-deep ≥ 6.8 on cards ·
+   ink on orange 5.8. */
+html[data-theme="dark"] {
+  --color-cream: #0f1b35; /* --navy */
+  --color-cream-2: #172040; /* --navy-2 */
+  --color-paper: #1e2a4a; /* --navy-3: cards */
+  --color-sand: #2d3d66; /* --navy-mid */
+  --color-night: #080f1e; /* --navy-dark */
+  --color-white: #24315a; /* focused fields stay dark */
+  --color-ink: #f5f7fc;
+  --color-ink-2: #aeb8ce;
+  --color-ink-3: #8896b3;
+  --color-grey: #8896b3;
+  --color-orange: #f25c2e;
+  --color-orange-ink: #f25c2e;
+  --color-orange-deep: #ff7f50;
+  --color-orange-soft: #3d2a36;
+  --color-ink-hover: #172040;
+  --color-orange-hover: #ff6f42;
+  --color-night-hover: #111d3a;
+  --line: color-mix(in oklab, var(--color-ink) 12%, transparent);
+  --line-strong: color-mix(in oklab, var(--color-ink) 22%, transparent);
+  color-scheme: dark;
+}
+
+/* Surfaces that are dark in the light theme stay dark (navy-dark, light type on them) instead of inverting. */
+html[data-theme="dark"] :is(.bg-ink, .bg-night, [class^="bg-ink/"], [class*=" bg-ink/"]) {
+  --color-ink: #080f1e;
+  --color-paper: #f5f7fc;
+}
+/* Interactive ink pills sit on a navy ground of nearly the same value: outline them, as the live site does. */
+html[data-theme="dark"] :is(a, button).bg-ink {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+}
+/* Orange fills keep dark type (navy-dark on orange 5.8, white would be 3.3). */
+html[data-theme="dark"] :is(.bg-orange, .hover\:bg-orange:hover, .group:hover .group-hover\:bg-orange) {
+  --color-ink: #080f1e;
+  --color-ink-2: #141c30;
+  --color-ink-3: #26304a;
+  --color-paper: #f5f7fc;
+  --line: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  --line-strong: color-mix(in oklab, var(--color-ink) 24%, transparent);
+}
+/* Type that inherits its colour (no text-* class of its own) arrives already resolved to the page's light ink, so
+   orange fills re-declare it. In the base layer, so an element's own text-* utility still wins. */
+@layer base {
+  html[data-theme="dark"] :is(.bg-orange, .hover\:bg-orange:hover, .group:hover .group-hover\:bg-orange) {
+    color: var(--color-ink);
+  }
+}
+/* The embossed SB texture is cream; on navy it swaps to the same marks pressed into navy
+   (public/brand/emboss-tile-dark.svg, scripts/build-emboss.mjs). Orange fills keep the cream tile, multiplied. */
+html[data-theme="dark"] [class*="emboss-tile"]:not(.bg-orange *) {
+  background-image: url("/brand/emboss-tile-dark.svg");
+  mix-blend-mode: normal;
+  filter: none;
+}
+
+/* Switching themes recolours everything at once rather than through each element's own transition. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--color-orange);
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-orange-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+  }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: var(--max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* Display: Clash Display, heavy, in the copy's own case — the live site's heading voice. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    word-spacing: 0.08em;
+    /* `anywhere`, not `break-word`: it also lowers the min-content width, so a long unbroken string (an email
+       address set in display type) can't widen its grid column past a phone screen. */
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+  .display-soft {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    word-spacing: 0.04em;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-orange);
+    flex: none;
+  }
+
+  .lede {
+    font-size: var(--fs-lede);
+    line-height: 1.5;
+    color: var(--color-ink-2);
+  }
+
+  /* Tags that sit on the type, Two26-style, in brand colours. */
+  .tag {
+    display: inline-flex;
+    word-spacing: normal;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 0.42rem 0.85rem 0.46rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* Line masks: each line of a heading rises from behind its own clip. */
+  .line-mask {
+    display: block;
+    overflow: clip;
+    overflow-clip-margin: 0.04em;
+    padding-bottom: 0.035em;
+    margin-bottom: -0.035em;
+  }
+  .line-mask > .line-inner {
+    display: block;
+    will-change: transform;
+  }
+
+  .rule {
+    height: 1px;
+    background: var(--line);
+    border: 0;
+  }
+
+  /* Project cover hover: layers and shapes only; CoverReveal.tsx drives the timing. Stacked bottom to top: the
+     two colour blobs, the window onto the render, the metric. */
+  .cover-reveal {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-radius: inherit;
+    visibility: hidden;
+  }
+  .cover-window {
+    position: absolute;
+    inset: 0;
+    clip-path: circle(0% at 50% 50%);
+  }
+  .cover-blob {
+    position: absolute;
+    width: 400%;
+    aspect-ratio: 1;
+    border-radius: 46% 54% 52% 48% / 52% 46% 54% 48%;
+    background: var(--accent);
+    transform: translate(-50%, -50%) rotate(-50deg) scale(0);
+  }
+  .cover-reveal[data-from="bottom"] .cover-blob { left: 18%; top: 128%; }
+  .cover-reveal[data-from="bottom"] .cover-blob + .cover-blob { left: 86%; top: 145%; }
+  .cover-reveal[data-from="top-right"] .cover-blob { left: 106%; top: -16%; }
+  .cover-reveal[data-from="top-right"] .cover-blob + .cover-blob { left: 52%; top: -38%; }
+  .cover-reveal[data-from="left"] .cover-blob { left: -22%; top: 28%; }
+  .cover-reveal[data-from="left"] .cover-blob + .cover-blob { left: -36%; top: 92%; }
+  .cover-note {
+    position: absolute;
+    left: clamp(1rem, 2.4vw, 1.5rem);
+    bottom: clamp(1rem, 2.4vw, 1.5rem);
+    max-width: min(68%, 22rem);
+    color: var(--on-accent);
+    opacity: 0;
+  }
+}
+
+/* Before hydration, anything that will animate in is hidden only when JS is available and motion is allowed —
+   so no-JS and reduced-motion visitors always see the content. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] {
+    opacity: 0;
+  }
+  html.js [data-lines] .line-inner {
+    transform: translateY(105%);
+  }
+  html.js [data-lines] [data-tag] {
+    opacity: 0;
+  }
+  html.js [data-intro-hide] {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee var(--marquee-speed, 38s) linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Process path (components/home/ProcessPath.tsx): a thick line drawn over a pale track, and cartoon cubes
+   (black edges, orange faces, a peach sticker behind) that spin into place as the line reaches them. */
+.process-track,
+.process-line {
+  stroke-width: 8;
+}
+@media (min-width: 768px) {
+  .process-track,
+  .process-line {
+    stroke-width: 13;
+  }
+}
+.process-track {
+  stroke: color-mix(in oklab, var(--color-orange) 32%, var(--color-cream));
+}
+.process-line {
+  stroke: var(--color-orange);
+}
+
+.process-cube {
+  --s: 2.75rem;
+  --edge: #1c1916;
+  width: var(--s);
+  height: var(--s);
+  perspective: 32rem;
+}
+@media (min-width: 768px) {
+  .process-cube {
+    --s: 3.5rem;
+  }
+}
+.process-cube__halo {
+  position: absolute;
+  inset: -22%;
+  border-radius: 34%;
+  background: color-mix(in oklab, var(--color-orange) 34%, var(--color-cream));
+  transform: rotate(-10deg) scale(0.4);
+  opacity: 0;
+  transition:
+    transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 400ms ease;
+}
+.process-cube__body {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-24deg) rotateY(-394deg) scale(0.82);
+  transition: transform 1100ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.process-cube__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid color-mix(in oklab, var(--edge) 40%, transparent);
+  border-radius: 22%;
+  background: color-mix(in oklab, var(--color-orange) 14%, var(--color-cream));
+  color: color-mix(in oklab, var(--edge) 50%, transparent);
+  font-family: var(--font-display, inherit);
+  font-size: calc(var(--s) * 0.4);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  backface-visibility: hidden;
+  transition:
+    background-color 500ms ease,
+    border-color 500ms ease,
+    color 500ms ease;
+}
+.process-cube__face.is-front { transform: translateZ(calc(var(--s) / 2)); }
+.process-cube__face.is-back { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
+.process-cube__face.is-right { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
+.process-cube__face.is-left { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
+.process-cube__face.is-top { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
+.process-cube__face.is-bottom { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
+
+.process-cube[data-on="1"] .process-cube__halo {
+  transform: rotate(-10deg) scale(1);
+  opacity: 1;
+}
+.process-cube[data-on="1"] .process-cube__body {
+  transform: rotateX(-24deg) rotateY(-34deg) scale(1);
+}
+.process-cube[data-on="1"] .process-cube__face {
+  border-color: var(--edge);
+  color: var(--edge);
+  background: #fdd3b3;
+}
+.process-cube[data-on="1"] .process-cube__face:is(.is-front, .is-back) {
+  background: #f58634;
+}
+.process-cube[data-on="1"] .process-cube__face:is(.is-top, .is-bottom) {
+  background: #f9a566;
+}
+/* On the navy ground a cream-mixed face goes muddy; waiting cubes are a dim orange outline instead. */
+html[data-theme="dark"] .process-cube[data-on="0"] .process-cube__face {
+  background: color-mix(in oklab, var(--color-orange) 18%, var(--color-cream));
+  border-color: color-mix(in oklab, var(--color-orange) 60%, transparent);
+  color: color-mix(in oklab, var(--color-orange) 80%, transparent);
+}
