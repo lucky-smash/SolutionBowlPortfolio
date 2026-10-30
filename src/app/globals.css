@@ -187,6 +187,14 @@ html.theme-switching *::after {
     overflow-wrap: anywhere;
     hyphens: auto;
   }
+  /* WebKit (Safari, and every browser on iPhone) mis-measures balanced lines that carry word-spacing and breaks
+     headings that fit, e.g. "Real / Products." at 390px. Plain wrapping there; `hanging-punctuation` is
+     WebKit-only, so other engines keep the balanced headings. */
+  @supports (hanging-punctuation: first) {
+    .display {
+      text-wrap: wrap;
+    }
+  }
   .display-soft {
     font-family: var(--font-display);
     font-weight: 600;
