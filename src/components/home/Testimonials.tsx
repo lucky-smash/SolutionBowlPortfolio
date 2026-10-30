@@ -61,7 +61,7 @@ export default function Testimonials({ items, eyebrow = 'In their words', title 
               </span>
             </div>
           </div>
-          <div ref={deck} className="relative grid min-h-[22rem] lg:col-span-7 lg:col-start-6">
+          <div ref={deck} className="relative grid min-h-[18rem] sm:min-h-[22rem] lg:col-span-7 lg:col-start-6">
             {[2, 1, 0].map((depth) => {
               const t = items[(i + depth) % n];
               return (

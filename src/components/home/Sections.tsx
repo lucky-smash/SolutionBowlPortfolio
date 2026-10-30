@@ -32,9 +32,9 @@ export function Statement() {
           <p className="lede" data-reveal>
             {belief.body}
           </p>
-          <figure className="relative rounded-[var(--radius)] bg-paper p-7 shadow-[0_20px_40px_-30px_rgb(60_30_5/0.45)]" data-reveal data-reveal-delay="120">
+          <figure className="relative rounded-[var(--radius)] bg-paper p-6 shadow-[0_20px_40px_-30px_rgb(60_30_5/0.45)]" data-reveal data-reveal-delay="120">
             <span aria-hidden className="display absolute -top-6 left-6 text-7xl leading-none text-orange">“</span>
-            <blockquote className="display-soft text-[1.45rem] leading-snug">{founder.quote}</blockquote>
+            <blockquote className="display-soft text-[1.25rem] leading-snug sm:text-[1.45rem]">{founder.quote}</blockquote>
             <figcaption className="mt-5 flex items-center justify-between gap-4 text-sm">
               <span>
                 <strong className="block font-semibold">{founder.name}</strong>
@@ -107,13 +107,13 @@ export function Capabilities() {
             <li key={it.title}>
               <Link
                 href="/services"
-                className="group relative isolate grid grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-x-6 gap-y-3 overflow-hidden border-b border-ink py-8 md:grid-cols-[4rem_minmax(0,1.15fr)_minmax(0,1fr)_auto] md:py-10"
+                className="group relative isolate grid grid-cols-1 items-baseline gap-x-6 gap-y-3 overflow-hidden border-b border-ink py-7 sm:grid-cols-[3rem_minmax(0,1fr)] sm:py-8 md:grid-cols-[4rem_minmax(0,1.15fr)_minmax(0,1fr)_auto] md:py-10"
               >
                 <span aria-hidden className="absolute inset-0 -z-10 origin-left scale-x-0 bg-orange transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-x-100 group-focus-visible:scale-x-100" />
                 <span className="text-sm font-semibold tabular-nums text-ink-2 group-hover:text-ink">{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="display text-[clamp(1.8rem,1.08rem+2.34vw,3.51rem)] transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:translate-x-3">{it.title}</h3>
-                <p className="col-start-2 max-w-xl text-ink-2 group-hover:text-ink md:col-start-3">{it.body}</p>
-                <ul className="col-start-2 flex flex-wrap gap-2 md:col-start-4 md:max-w-[12rem] md:justify-end">
+                <h3 className="display text-[1.65rem] sm:text-[clamp(1.8rem,1.08rem+2.34vw,3.51rem)] transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:translate-x-3">{it.title}</h3>
+                <p className="max-w-xl text-ink-2 sm:col-start-2 group-hover:text-ink md:col-start-3">{it.body}</p>
+                <ul className="flex flex-wrap gap-2 sm:col-start-2 md:col-start-4 md:max-w-[12rem] md:justify-end">
                   {it.tags.map((t) => (
                     <li key={t} className="tag border border-[var(--line-strong)] bg-paper/60">
                       {t}
@@ -152,13 +152,13 @@ export function AiStudio() {
             </figure>
             <ul className="grid gap-px overflow-hidden rounded-[var(--radius)] bg-paper/12 sm:grid-cols-2 lg:col-span-8 xl:grid-cols-4" data-stagger>
               {a.capabilities.map((c, i) => (
-                <li key={c.title} className="group flex min-h-48 flex-col justify-between gap-6 bg-night p-6 transition-colors duration-500 hover:bg-night-hover">
+                <li key={c.title} className="group flex flex-col justify-between gap-4 bg-night p-5 transition sm:min-h-48 sm:gap-6 sm:p-6-colors duration-500 hover:bg-night-hover">
                   <span className="flex items-center justify-between text-xs font-semibold tabular-nums text-paper/50">
                     {String(i + 1).padStart(2, '0')}
                     <span aria-hidden className="size-2 rounded-full bg-orange transition-transform duration-500 group-hover:scale-[2.2]" />
                   </span>
                   <span>
-                    <span className="display-soft block text-[1.45rem]">{c.title}</span>
+                    <span className="display-soft block text-[1.3rem] sm:text-[1.45rem]">{c.title}</span>
                     <span className="mt-2 block text-[0.95rem] leading-snug text-paper/65">{c.body}</span>
                   </span>
                 </li>
@@ -198,11 +198,11 @@ export function WhyUs() {
             {w.items.map((it, i) => (
               <li
                 key={it.title}
-                className={`flex min-h-64 flex-col justify-between rounded-[var(--radius)] p-7 ${i === 1 ? 'bg-orange' : i === 2 ? 'bg-ink text-paper' : 'bg-paper'}`}
+                className={`flex flex-col justify-between gap-6 rounded-[var(--radius)] p-6 sm:min-h-64 sm:p-7 ${i === 1 ? 'bg-orange' : i === 2 ? 'bg-ink text-paper' : 'bg-paper'}`}
               >
-                <span className="display text-6xl leading-none opacity-90">{String(i + 1).padStart(2, '0')}</span>
+                <span className="display text-5xl leading-none opacity-90 sm:text-6xl">{String(i + 1).padStart(2, '0')}</span>
                 <span>
-                  <span className="display-soft block text-[1.6rem] leading-tight">{it.title}</span>
+                  <span className="display-soft block text-[1.35rem] leading-tight sm:text-[1.6rem]">{it.title}</span>
                   <span className={`mt-3 block ${i === 2 ? 'text-paper/75' : i === 1 ? 'text-ink' : 'text-ink-2'}`}>{it.body}</span>
                 </span>
               </li>
@@ -271,7 +271,7 @@ export function FinalCta({
         </p>
         <ul className="mx-auto mt-8 flex max-w-4xl flex-wrap justify-center gap-2" data-stagger>
           {points.map((p) => (
-            <li key={p} className="tag border border-[var(--line-strong)] bg-paper py-2.5 text-[0.875rem] font-medium">
+            <li key={p} className="tag border border-[var(--line-strong)] bg-paper py-2.5 text-[0.875rem] font-medium max-sm:whitespace-normal max-sm:text-left">
               <span aria-hidden className="size-1.5 rounded-full bg-orange" />
               {p}
             </li>
