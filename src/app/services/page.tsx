@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Link from 'next/link';
 import Lines from '@/components/ui/Lines';
 import SectionHead from '@/components/ui/SectionHead';
@@ -8,11 +9,11 @@ import { getService, serviceGroups } from '@/content/services';
 import { products } from '@/content/products';
 import { homeExtras } from '@/content/company';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Services | SolutionBowl.ai',
   description: homeExtras.capabilities.intro,
-  alternates: { canonical: '/services' },
-};
+  path: '/services',
+});
 
 /** Every service and product, grouped as on the live site's Services menu. */
 export default function ServicesIndex() {

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Intro from '@/components/home/Intro';
 import Hero from '@/components/home/Hero';
 import FeaturedWork from '@/components/home/FeaturedWork';
@@ -8,11 +9,11 @@ import { AiStudio, Capabilities, Faqs, FinalCta, Process, Ribbon, Statement, Why
 import Testimonials from '@/components/home/Testimonials';
 import { aboutPage } from '@/content/company';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: home.meta.title,
   description: home.meta.description,
-  alternates: { canonical: '/' },
-};
+  path: '/',
+});
 
 export default function HomePage() {
   return (

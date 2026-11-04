@@ -9,7 +9,9 @@ import { headings, summarise } from '@/components/blog/utils';
 import { Arrow } from '@/components/chrome/Nav';
 import { FinalCta } from '@/components/home/Sections';
 import { getPost, posts } from '@/content/blog';
-import { company } from '@/content/site';
+import JsonLd from '@/components/seo/JsonLd';
+import { absoluteUrl, breadcrumbJsonLd, pageMeta } from '@/lib/seo';
+import { ORG_ID } from '@/lib/schema';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -23,13 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) return {};
-  const url = `/blog/${post.slug}`;
-  return {
-    title: post.meta.title,
-    description: post.meta.description,
-    alternates: { canonical: url },
-    openGraph: { type: 'article', title: post.meta.title, description: post.meta.description, url },
-  };
+  return pageMeta({ title: post.meta.title, description: post.meta.description, path: `/blog/${post.slug}`, type: 'article' });
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -39,20 +35,32 @@ export default async function BlogPostPage({ params }: Props) {
 
   const toc = headings(post.body);
   const others = posts.filter((p) => p.slug !== post.slug).map(summarise);
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.meta.description,
-    articleSection: post.category,
-    mainEntityOfPage: `${company.url}/blog/${post.slug}`,
-    author: { '@type': 'Organization', name: 'SolutionBowl', url: company.url },
-    publisher: { '@type': 'Organization', name: 'SolutionBowl', url: company.url },
-  };
+  const path = `/blog/${post.slug}`;
+  // The live posts publish no date, so none is claimed here.
+  const jsonLd = [
+    breadcrumbJsonLd([
+      { name: 'Blog', path: '/blog' },
+      { name: post.title, path },
+    ]),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.meta.description,
+      articleSection: post.category,
+      inLanguage: 'en',
+      url: absoluteUrl(path),
+      mainEntityOfPage: absoluteUrl(path),
+      image: absoluteUrl('/og-image.png'),
+      ...(post.date && { datePublished: post.date }),
+      author: { '@id': ORG_ID },
+      publisher: { '@id': ORG_ID },
+    },
+  ];
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+      <JsonLd data={jsonLd} />
 
       <article aria-labelledby="post-title">
         <header className="relative overflow-hidden pb-[clamp(3rem,6vw,5.5rem)] pt-[calc(var(--header-h)+clamp(1.5rem,4vw,3.5rem))]">

@@ -7,7 +7,10 @@ import Button from '@/components/ui/Button';
 import { FinalCta } from '@/components/home/Sections';
 import { TypePanel } from '@/components/portfolio/WorkGrid';
 import { Arrow } from '@/components/chrome/Nav';
+import JsonLd from '@/components/seo/JsonLd';
 import { getProject, projects } from '@/content/projects';
+import { absoluteUrl, breadcrumbJsonLd, pageMeta } from '@/lib/seo';
+import { ORG_ID } from '@/lib/schema';
 
 export function generateStaticParams() {
   return projects.map((p) => ({ slug: p.id }));
@@ -16,11 +19,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const p = getProject((await params).slug);
   if (!p) return {};
-  return {
+  return pageMeta({
     title: `${p.name} — ${p.descriptor} | SolutionBowl.ai Portfolio`,
     description: p.summary,
-    alternates: { canonical: `/portfolio/${p.id}` },
-  };
+    path: `/portfolio/${p.id}`,
+  });
 }
 
 /** A project page built only from the published portfolio entry: identity, summary, results and live links. */
@@ -33,8 +36,29 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const next = projects[(i + 1) % projects.length];
   const nameLines = p.name.length > 14 ? p.name.split(' ') : [p.name];
 
+  const path = `/portfolio/${p.id}`;
   return (
     <>
+      <JsonLd
+        data={[
+          breadcrumbJsonLd([
+            { name: 'Portfolio', path: '/portfolio' },
+            { name: p.name, path },
+          ]),
+          {
+            '@context': 'https://schema.org',
+            '@type': 'CreativeWork',
+            name: p.name,
+            headline: p.descriptor,
+            description: p.summary,
+            url: absoluteUrl(path),
+            sameAs: p.url,
+            genre: p.sector,
+            ...(p.image && { image: absoluteUrl(`/img/portfolio/${p.image}.webp`) }),
+            creator: { '@id': ORG_ID },
+          },
+        ]}
+      />
       <article>
         <header className="relative overflow-hidden pt-[calc(var(--header-h)+clamp(1.5rem,4vw,3rem))]">
           <div className="wrap">

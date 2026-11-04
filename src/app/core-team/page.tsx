@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import { teamPage } from '@/content/company';
 import { FinalCta } from '@/components/home/Sections';
 import { Browse, Leadership, TeamBelief, TeamHero, TeamStats } from '@/components/company/Team';
 import Doors from '@/components/company/Doors';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: teamPage.meta.title,
   description: teamPage.meta.description,
-  alternates: { canonical: '/core-team' },
-};
+  path: '/core-team',
+});
 
 export default function CoreTeamPage() {
   const { doors } = teamPage;

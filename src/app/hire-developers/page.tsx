@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import OfferingPage from '@/components/offering/OfferingPage';
 import { hire } from '@/content/hire';
 import { nav } from '@/content/site';
 
-export const metadata: Metadata = { title: hire.meta.title, description: hire.meta.description, alternates: { canonical: '/hire-developers' } };
+export const metadata: Metadata = pageMeta({ title: hire.meta.title, description: hire.meta.description, path: '/hire-developers' });
 
 export default function HirePage() {
   return (

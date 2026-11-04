@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Lines from '@/components/ui/Lines';
 import FeaturedPost from '@/components/blog/FeaturedPost';
 import PostIndex from '@/components/blog/PostIndex';
@@ -6,12 +7,11 @@ import { summarise } from '@/components/blog/utils';
 import { FinalCta } from '@/components/home/Sections';
 import { blogIntro, posts } from '@/content/blog';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Blog | SolutionBowl',
   description: blogIntro.lede,
-  alternates: { canonical: '/blog' },
-  openGraph: { title: blogIntro.title, description: blogIntro.lede, url: '/blog' },
-};
+  path: '/blog',
+});
 
 export default function BlogIndexPage() {
   const featured = posts.find((p) => p.featured) ?? posts[0];

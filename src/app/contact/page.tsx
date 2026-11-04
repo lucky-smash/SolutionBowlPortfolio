@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { pageMeta } from '@/lib/seo';
 import Lines from '@/components/ui/Lines';
 import SectionHead from '@/components/ui/SectionHead';
 import Button from '@/components/ui/Button';
@@ -9,11 +10,11 @@ import { contact, offices, socials } from '@/content/site';
 import { toLines } from '@/lib/text';
 import { Arrow } from '@/components/chrome/Nav';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: contactPage.meta.title,
   description: contactPage.meta.description,
-  alternates: { canonical: '/contact' },
-};
+  path: '/contact',
+});
 
 export default function ContactPage() {
   const c = contactPage;

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { absoluteUrl, breadcrumbJsonLd, pageMeta } from '@/lib/seo';
+import JsonLd from '@/components/seo/JsonLd';
 import PortfolioHero from '@/components/portfolio/PortfolioHero';
 import WorkGrid from '@/components/portfolio/WorkGrid';
 import SectionHead from '@/components/ui/SectionHead';
@@ -6,15 +8,33 @@ import { FinalCta } from '@/components/home/Sections';
 import { Arrow } from '@/components/chrome/Nav';
 import { apps, portfolioIntro, projects } from '@/content/projects';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: 'Software Development Portfolio | 500+ Live Projects | SolutionBowl.ai',
   description: portfolioIntro.tagline + ' ' + portfolioIntro.claim,
-  alternates: { canonical: '/portfolio' },
-};
+  path: '/portfolio',
+});
+
+// Each project has its own page, so the list points crawlers at those pages.
+const portfolioJsonLd = [
+  breadcrumbJsonLd([{ name: 'Portfolio', path: '/portfolio' }]),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'SolutionBowl software development portfolio',
+    numberOfItems: projects.length,
+    itemListElement: projects.map((p, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: p.name,
+      url: absoluteUrl(`/portfolio/${p.id}`),
+    })),
+  },
+];
 
 export default function PortfolioPage() {
   return (
     <>
+      <JsonLd data={portfolioJsonLd} />
       <PortfolioHero />
 
       {/* Every project, laid out as an editorial spread. */}

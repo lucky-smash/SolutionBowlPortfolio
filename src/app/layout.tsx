@@ -6,7 +6,10 @@ import Nav from '@/components/chrome/Nav';
 import Footer from '@/components/chrome/Footer';
 import MotionRoot from '@/components/motion/MotionRoot';
 import PageCurtain from '@/components/motion/PageCurtain';
+import JsonLd from '@/components/seo/JsonLd';
 import { company, home } from '@/content/site';
+import { siteJsonLd } from '@/lib/schema';
+import { OG_IMAGE } from '@/lib/seo';
 
 // The live site's typefaces: Clash Display (Indian Type Foundry, via Fontshare — free for commercial use,
 // self-hosted here) for headings, Plus Jakarta Sans for text and UI.
@@ -30,8 +33,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(company.url),
   title: { default: home.meta.title, template: '%s' },
   description: home.meta.description,
-  icons: { icon: '/brand/favicon.ico' },
-  openGraph: { siteName: 'SolutionBowl', type: 'website' },
+  icons: { icon: '/brand/favicon.ico', apple: '/brand/sb-symbol-512.png' },
+  openGraph: { siteName: 'SolutionBowl', type: 'website', locale: 'en_US', images: [OG_IMAGE] },
+  twitter: { card: 'summary_large_image', images: [OG_IMAGE] },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },
 };
 
 export const viewport: Viewport = {
@@ -49,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: boot }} />
       </head>
       <body suppressHydrationWarning>
+        <JsonLd data={siteJsonLd} />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-paper"
