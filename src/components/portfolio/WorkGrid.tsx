@@ -85,7 +85,7 @@ function WorkCard({ p, tall, index }: { p: Project; tall: boolean; index: number
           ) : (
             <TypePanel p={p} />
           )}
-          {p.image && p.accent && <CoverReveal image={p.image} accent={p.accent} note={p.metrics[0]} label={p.urlLabel} index={index} sizes="(min-width: 1024px) 50vw, 100vw" />}
+          {p.image && p.accent && <CoverReveal accent={p.accent} index={index} />}
           <span className="absolute bottom-4 right-4 grid size-12 translate-y-3 place-items-center rounded-full bg-ink text-paper opacity-0 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:-rotate-45 group-hover:opacity-100">
             <Arrow />
           </span>

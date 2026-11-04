@@ -49,7 +49,7 @@ export default function FeaturedWork() {
                     sizes="(min-width: 1024px) 55vw, (min-width: 768px) 50vw, 100vw"
                     className="object-cover transition-transform duration-[1200ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]"
                   />
-                  {p.accent && <CoverReveal image={p.image!} accent={p.accent} note={p.metrics[0]} label={p.urlLabel} index={i} sizes="(min-width: 1024px) 55vw, (min-width: 768px) 50vw, 100vw" />}
+                  {p.accent && <CoverReveal accent={p.accent} index={i} />}
                   <span className="tag absolute left-4 top-4 bg-ink text-paper">{p.highlight}</span>
                   <span className="absolute bottom-4 right-4 grid size-12 translate-y-3 place-items-center rounded-full bg-orange text-ink opacity-0 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:-rotate-45 group-hover:opacity-100">
                     <Arrow />
