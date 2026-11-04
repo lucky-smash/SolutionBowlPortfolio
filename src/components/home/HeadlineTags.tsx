@@ -52,7 +52,7 @@ export default function HeadlineTags({ tags }: { tags: TagSpec[] }) {
         el.style.visibility = 'visible';
       });
     };
-    place();
+    // No synchronous first call: the observer fires once after layout, so reading positions doesn't force a reflow.
     const ro = new ResizeObserver(place);
     ro.observe(h);
     document.fonts?.ready.then(place);

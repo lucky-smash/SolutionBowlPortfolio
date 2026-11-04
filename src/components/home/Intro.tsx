@@ -34,6 +34,9 @@ export default function Intro() {
         hidden.forEach((h) => (h.style.opacity = '1'));
         return;
       }
+      // While the intro plays, the hero copy is fully painted under the overlay (so the browser's Largest
+      // Contentful Paint is the first paint, not the end of the intro); it is hidden only now, behind the wash.
+      hidden.forEach((h) => (h.style.opacity = '0'));
       animate(navItems, { translateY: ['-140%', '0%'], opacity: [0, 1], duration: 1000, delay: stagger(60, { start: delay }), ease: EASE.out });
       animate(hidden, { translateY: [24, 0], opacity: [0, 1], duration: 1000, delay: stagger(110, { start: delay + 650 }), ease: EASE.out });
     };

@@ -3,6 +3,15 @@
 /* `dark:` utilities follow the site's own toggle (html[data-theme="dark"]), not the OS setting. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* The rupee sign (in a couple of project figures) is the only character on the site outside Plus Jakarta Sans's
+   preloaded Latin file; without this it pulls a second, 22 KB Latin-Extended font into every page that shows it.
+   It is drawn from a system font instead (falls through to Jakarta if none of these exist). */
+@font-face {
+  font-family: "SB Rupee";
+  src: local("Segoe UI"), local("Arial"), local("Helvetica Neue"), local("Roboto"), local("Noto Sans");
+  unicode-range: U+20B9;
+}
+
 /* ───────────────────────── Solution Bowl design tokens ─────────────────────────
    Brand orange and grey are sampled from the official logo (public/brand/solution-bowl-logo.png).
    Contrast (WCAG): ink on cream 14.9 · ink-2 on cream 5.8 · orange-deep on cream 4.8 (small text) ·
@@ -26,7 +35,7 @@
   --color-night-hover: #221e1a;
 
   --font-display: var(--font-clash), system-ui, sans-serif;
-  --font-sans: var(--font-jakarta), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "SB Rupee", var(--font-jakarta), system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -296,7 +305,8 @@ html.theme-switching *::after {
   html.js [data-lines] [data-tag] {
     opacity: 0;
   }
-  html.js [data-intro-hide] {
+  /* Only when the intro is skipped: when it plays, the overlay covers the hero and Intro hides it on arrival. */
+  html.js.intro-skip [data-intro-hide] {
     opacity: 0;
   }
 }

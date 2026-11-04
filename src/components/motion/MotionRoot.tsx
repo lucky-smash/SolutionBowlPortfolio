@@ -146,7 +146,8 @@ export default function MotionRoot() {
     };
 
     scan();
-    tick();
+    // First fill on the next frame, after scan()'s DOM writes have been laid out (no forced reflow).
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     // Client components can mount after this effect; pick up their attributes too.

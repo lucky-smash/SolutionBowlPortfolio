@@ -89,7 +89,7 @@ export default function ProcessPath({ steps }: { steps: { title: string; body: s
       setBox({ w: r.width, h: r.height });
       setD(s);
     };
-    build();
+    // The observer's first callback (after layout) builds the path; no forced reflow on mount.
     const ro = new ResizeObserver(build);
     ro.observe(el);
     return () => ro.disconnect();

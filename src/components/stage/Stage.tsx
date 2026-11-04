@@ -48,7 +48,9 @@ export default function Stage({ className = '' }: { className?: string }) {
     // the drawing — anchored right and bottom — grows as large as it can while the cast keeps clear of the copy
     // (every [data-stage-avoid] block in the section: its text, tags, links and buttons).
     const section = root.closest('section');
-    let boxes: number[][] = []; // the cast's footprint, measured below once the figures exist
+    let boxes: number[][] = []; // the cast's footprint, measured by measureCast (set below once the figures exist)
+    let measureCast = () => {};
+    let shown = 0; // the drawing currently on screen
     const obstacles = () => {
       const out: DOMRect[] = [];
       const range = document.createRange();
@@ -70,6 +72,7 @@ export default function Stage({ className = '' }: { className?: string }) {
         span[0] = 760;
         return;
       }
+      if (!boxes.length) measureCast();
       root.setAttribute('preserveAspectRatio', 'xMaxYMax meet');
       const box = root.getBoundingClientRect();
       if (!box.width || !box.height) return;
@@ -124,7 +127,8 @@ export default function Stage({ className = '' }: { className?: string }) {
     bot.root.setAttribute('transform', `translate(${pos.bot} ${GROUND}) scale(1.35)`);
 
     // The cast's real footprint (drawing units) over a walk cycle — swinging arms and boards included — for the
-    // desktop fit. The flourish is static.
+    // desktop fit. The flourish is static. Measuring poses the figures and reads their boxes, which forces a
+    // layout per pose, so it runs only the first time the desktop fit needs it (never on phones).
     const footprint = (node: SVGElement) => {
       const el = node as SVGGraphicsElement;
       const m = el.transform.baseVal.consolidate()?.matrix;
@@ -132,22 +136,25 @@ export default function Stage({ className = '' }: { className?: string }) {
       const [a, d, e, f] = m ? [m.a, m.d, m.e, m.f] : [1, 1, 0, 0];
       return [a * b.x + e, d * b.y + f, a * (b.x + b.width) + e, d * (b.y + b.height) + f];
     };
-    const castBoxes: number[][] = [figA.root, figB.root, bot.root].map(() => [Infinity, Infinity, -Infinity, -Infinity]);
-    for (let frame = 0; frame < FPS * 1.25; frame++) {
-      const t = frame / FPS;
-      figA.pose(t, true);
-      figB.pose(t, true);
-      bot.pose(t);
-      [figA.root, figB.root, bot.root].forEach((el, i) => {
-        const [x1, y1, x2, y2] = footprint(el);
-        const c = castBoxes[i];
-        castBoxes[i] = [Math.min(c[0], x1 - 8), Math.min(c[1], y1 - 8), Math.max(c[2], x2 + 8), Math.max(c[3], y2 + 8)];
-      });
-    }
-    castBoxes.push(FLOURISH_BOX);
-    boxes = castBoxes;
+    measureCast = () => {
+      const castBoxes: number[][] = [figA.root, figB.root, bot.root].map(() => [Infinity, Infinity, -Infinity, -Infinity]);
+      for (let frame = 0; frame < FPS * 1.25; frame++) {
+        const t = frame / FPS;
+        figA.pose(t, true);
+        figB.pose(t, true);
+        bot.pose(t);
+        [figA.root, figB.root, bot.root].forEach((el, i) => {
+          const [x1, y1, x2, y2] = footprint(el);
+          const c = castBoxes[i];
+          castBoxes[i] = [Math.min(c[0], x1 - 8), Math.min(c[1], y1 - 8), Math.max(c[2], x2 + 8), Math.max(c[3], y2 + 8)];
+        });
+      }
+      castBoxes.push(FLOURISH_BOX);
+      boxes = castBoxes;
+      draw(shown); // back to the drawing that was on screen
+    };
 
-    fit();
+    // No synchronous fit: the ResizeObserver's first callback (after layout, before paint) does it.
     window.addEventListener('resize', fit);
     // Headlines settle after fonts load and the line reveals finish; refit as they do.
     const refits = [300, 1200, 2600, 4500].map((ms) => window.setTimeout(fit, ms));
@@ -179,6 +186,7 @@ export default function Stage({ className = '' }: { className?: string }) {
     const paperNoise = root.querySelector<SVGFETurbulenceElement>('#st-paper-noise')!;
 
     const draw = (frame: number) => {
+      shown = frame;
       const t = frame / FPS;
       figA.pose(t, true);
       figB.pose(t, true);
