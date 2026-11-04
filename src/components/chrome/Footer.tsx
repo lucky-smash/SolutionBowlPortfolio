@@ -3,6 +3,9 @@ import Logo from '@/components/brand/Logo';
 import { company, contact, nav, offices, socials } from '@/content/site';
 import { Arrow } from './Nav';
 
+/** Everything except the portfolio lives on the main site. */
+const onMainSite = (href: string) => (href.startsWith('/portfolio') ? href : `${company.url}${href}`);
+
 export default function Footer() {
   const year = 2026;
   return (
@@ -13,7 +16,7 @@ export default function Footer() {
       <div className="wrap relative pt-[clamp(4rem,8vw,7rem)]">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <Link href="/" aria-label="Solution Bowl — home" className="inline-block rounded-[1.25rem] bg-paper px-5 py-4">
+            <Link href="/portfolio" aria-label="Solution Bowl — portfolio" className="inline-block rounded-[1.25rem] bg-paper px-5 py-4">
               <Logo className="h-14 w-auto" title={null} />
             </Link>
             <p className="display-soft mt-8 max-w-[18ch] text-[clamp(1.8rem,1.26rem+1.8vw,2.93rem)]">{company.tagline}</p>
@@ -21,7 +24,7 @@ export default function Footer() {
               Discuss your project, AI idea, or enterprise software requirement with our experts.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link href="/contact" className="group inline-flex items-center gap-3 rounded-full bg-ink py-2 pl-6 pr-2 font-semibold text-paper">
+              <Link href={onMainSite('/contact')} className="group inline-flex items-center gap-3 rounded-full bg-ink py-2 pl-6 pr-2 font-semibold text-paper">
                 Contact Us
                 <span className="grid size-9 place-items-center rounded-full bg-paper text-ink transition-transform duration-500 group-hover:-rotate-45">
                   <Arrow />
@@ -74,12 +77,12 @@ export default function Footer() {
           </p>
           <ul className="flex gap-6">
             <li>
-              <Link href="/privacy-policy" className="hover:underline">
+              <Link href={onMainSite('/privacy-policy')} className="hover:underline">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link href="/terms-and-conditions" className="hover:underline">
+              <Link href={onMainSite('/terms-and-conditions')} className="hover:underline">
                 Terms of Service
               </Link>
             </li>
@@ -103,7 +106,7 @@ function FooterCol({ title, links, className = '' }: { title: string; links: { l
       <ul className="space-y-2">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="text-[0.95rem] font-medium decoration-1 underline-offset-4 hover:underline">
+            <Link href={onMainSite(l.href)} className="text-[0.95rem] font-medium decoration-1 underline-offset-4 hover:underline">
               {l.label}
             </Link>
           </li>

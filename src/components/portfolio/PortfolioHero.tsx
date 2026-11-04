@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button';
 import HeadlineTags, { type TagSpec } from '@/components/home/HeadlineTags';
 import Stage from '@/components/stage/Stage';
 import { portfolioIntro } from '@/content/projects';
+import { company } from '@/content/site';
 
 const TAGS: TagSpec[] = [
   { label: 'EdTech', line: 0, at: 'end', dx: 0.14, dy: 0.1, rotate: -6, tone: 'orange' },
@@ -17,10 +18,7 @@ export default function PortfolioHero() {
     <section aria-labelledby="portfolio-title" className="relative flex min-h-[max(100svh,46rem)] flex-col overflow-hidden pt-[calc(var(--header-h)+0.75rem)]">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/emboss-tile.svg')] bg-[length:168px_148px] opacity-50 [mask-image:radial-gradient(120%_80%_at_100%_0%,#000_10%,transparent_60%)]" />
       <div data-stage-avoid className="wrap relative z-10">
-        <p className="eyebrow pt-2 text-ink-2" data-reveal>
-          Portfolio · 500+ live projects
-        </p>
-        <div className="relative mt-[clamp(1rem,3vh,2.5rem)] @container lg:max-w-[52rem]">
+        <div className="relative pt-2 mt-[clamp(1rem,3vh,2.5rem)] @container lg:max-w-[52rem]">
           <Lines as="h1" id="portfolio-title" lines={['Our Work.', 'Their Impact.']} className="display relative text-[clamp(2.4rem,11cqw,7.4rem)]" lineClassName={(i) => (i === 1 ? 'text-orange-ink' : '')}>
             <HeadlineTags tags={TAGS} />
           </Lines>
@@ -28,7 +26,8 @@ export default function PortfolioHero() {
       </div>
 
       <div className="pointer-events-none relative mt-4 h-[clamp(15rem,38svh,22rem)] lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[calc(var(--header-h)+2.75rem)] lg:mt-0 lg:h-auto">
-        <Stage className="h-full" />
+        {/* Desktop: the flourish runs on past the stage's top edge, out through the top of the page. */}
+        <Stage className="h-full lg:overflow-visible" />
       </div>
 
       <div data-stage-avoid className="wrap relative z-10">
@@ -37,8 +36,8 @@ export default function PortfolioHero() {
             {portfolioIntro.tagline} {portfolioIntro.claim}
           </p>
           <div className="mt-6 flex flex-wrap gap-3" data-reveal>
-            <Button href="#work">Explore Our Work</Button>
-            <Button href="/contact" variant="ghost">
+            <Button href="#featured">Explore Our Work</Button>
+            <Button href={`${company.url}/contact`} variant="ghost">
               Start a Project
             </Button>
           </div>

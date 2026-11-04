@@ -40,6 +40,14 @@ export default function Button({
         {inner}
       </a>
     );
+  // In-page anchors stay plain <a>: next/link ignores a click whose hash is already in the URL, so a second
+  // "Explore Our Work" click (or one after a refresh on #work) would do nothing.
+  if (href.startsWith('#'))
+    return (
+      <a href={href} className={cls}>
+        {inner}
+      </a>
+    );
   return (
     <Link href={href} className={cls}>
       {inner}

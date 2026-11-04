@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
-import Nav from '@/components/chrome/Nav';
 import Footer from '@/components/chrome/Footer';
 import MotionRoot from '@/components/motion/MotionRoot';
 import PageCurtain from '@/components/motion/PageCurtain';
@@ -62,7 +61,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to main content
         </a>
-        <Nav />
         <main id="main">{children}</main>
         <Footer />
         <MotionRoot />

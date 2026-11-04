@@ -47,7 +47,8 @@
 :root {
   --gutter: clamp(1.25rem, 0.55rem + 2.6vw, 3.5rem);
   --max: 100rem;
-  --header-h: 5.25rem;
+  /* No site header: this is just the top breathing room above each page's first section. */
+  --header-h: 2.5rem;
   --section: clamp(5.5rem, 3.5rem + 7vw, 10rem);
   --radius: 1.25rem;
   --radius-lg: 2rem;

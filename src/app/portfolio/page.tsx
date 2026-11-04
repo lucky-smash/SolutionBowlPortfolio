@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { absoluteUrl, breadcrumbJsonLd, pageMeta } from '@/lib/seo';
 import JsonLd from '@/components/seo/JsonLd';
 import PortfolioHero from '@/components/portfolio/PortfolioHero';
+import PortfolioIntro from '@/components/portfolio/PortfolioIntro';
 import WorkGrid from '@/components/portfolio/WorkGrid';
 import SectionHead from '@/components/ui/SectionHead';
 import { FinalCta } from '@/components/home/Sections';
@@ -36,6 +37,9 @@ export default function PortfolioPage() {
     <>
       <JsonLd data={portfolioJsonLd} />
       <PortfolioHero />
+
+      {/* The live portfolio's intro copy beside its four headline projects. */}
+      <PortfolioIntro />
 
       {/* Every project, laid out as an editorial spread. */}
       <section id="work" aria-labelledby="all-work" className="scroll-mt-24 py-[var(--section)]">

@@ -184,6 +184,8 @@ export const projects: Project[] = [
     metrics: ['3x consultation bookings', '98% client satisfaction'],
     url: 'https://ercounselingservices.com/',
     urlLabel: 'ercounselingservices.com',
+    image: 'ERCounseling3D',
+    accent: '#5b3f7a',
   },
   {
     id: 'jm-cadworx',
@@ -197,6 +199,8 @@ export const projects: Project[] = [
     metrics: ['48hr average delivery turnaround', '200% growth in online orders'],
     url: 'https://jmcadworx.com/',
     urlLabel: 'jmcadworx.com',
+    image: 'JMCadworx3D',
+    accent: '#2f5d84',
   },
   {
     id: 'appdates',
@@ -209,6 +213,8 @@ export const projects: Project[] = [
     metrics: ['Cross-platform iOS & Android', 'Real-time matching engine'],
     url: 'https://webapp.appdates.news/#/welcome-screen',
     urlLabel: 'webapp.appdates.news',
+    image: 'AppDates3D',
+    accent: '#9c0f14',
   },
   {
     id: 'atma-india',
@@ -222,6 +228,8 @@ export const projects: Project[] = [
     metrics: ['100% mobile responsive', 'Govt. compliance ready'],
     url: 'https://www.atmaindia.org.in/',
     urlLabel: 'atmaindia.org.in',
+    image: 'ATMAIndia3D',
+    accent: '#0d56c2',
   },
   {
     id: 'droneplanet',
@@ -235,6 +243,8 @@ export const projects: Project[] = [
     metrics: ['500+ service providers onboarded', 'Multi-vertical marketplace'],
     url: 'https://droneplanet.in/',
     urlLabel: 'droneplanet.in',
+    image: 'DronePlanet3D',
+    accent: '#1f7ad6',
   },
 ];
 
@@ -292,4 +302,5 @@ export const portfolioIntro = {
   title: ['Real Products.', 'Measurable Impact.', 'Proven Results.'],
   tagline: 'A portfolio of shipped software with measurable business outcomes.',
   claim: '500+ live digital products across EdTech, FinTech, Healthcare, E-Commerce and Enterprise, delivered to clients in 10+ countries.',
+  body: 'Our software development portfolio spans 500+ live digital products across EdTech, FinTech, Healthcare, E-Commerce, and Enterprise - delivered to founders, CTOs, and operations leaders across 10+ countries. Every engagement on this page is a verified business outcome. Not a concept. Not a prototype. A shipped product with numbers attached.',
 };

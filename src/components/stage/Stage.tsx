@@ -308,7 +308,7 @@ export default function Stage({ className = '' }: { className?: string }) {
 
       {/* A network flourish, from the molecule cluster in the SB logo: one sweeping line threading three nodes. */}
       <g className="flourish" fill="none" stroke="#f58634" strokeLinecap="round">
-        <path d="M1660 -20 C1540 60 1350 70 1330 210 C1310 350 1520 330 1560 470 C1590 570 1500 640 1420 700" strokeWidth="17" />
+        <path d="M1840 -140 L1660 -20 C1540 60 1350 70 1330 210 C1310 350 1520 330 1560 470 C1590 570 1500 640 1420 700" strokeWidth="17" />
         <circle cx="1331" cy="205" r="34" strokeWidth="15" fill="var(--color-cream)" />
         <circle cx="1556" cy="455" r="22" strokeWidth="13" fill="var(--color-cream)" />
         <circle cx="1470" cy="58" r="13" strokeWidth="11" fill="var(--color-cream)" />

@@ -5,7 +5,7 @@ import Lines from '@/components/ui/Lines';
 import ProcessPath from './ProcessPath';
 import MarqueeToggle from '@/components/ui/MarqueeToggle';
 import { aboutPage, homeExtras } from '@/content/company';
-import { headlineStats } from '@/content/site';
+import { company, headlineStats } from '@/content/site';
 import { Arrow } from '@/components/chrome/Nav';
 
 /** "What we believe": the About statement, filling with ink as it is read. */
@@ -278,7 +278,7 @@ export function FinalCta({
           ))}
         </ul>
         <div className="mt-10 flex flex-wrap justify-center gap-3" data-reveal>
-          <Button href="/contact#contact-form">Book a Strategy Call</Button>
+          <Button href={`${company.url}/contact#contact-form`}>Book a Strategy Call</Button>
           <Button href="https://wa.me/918882958753" variant="ghost">
             WhatsApp us
           </Button>

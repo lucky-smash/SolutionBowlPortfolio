@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
 import { Arrow } from '@/components/chrome/Nav';
+import { company } from '@/content/site';
 
 export const metadata: Metadata = {
   title: 'Page not found | SolutionBowl',
@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 };
 
 const elsewhere = [
-  { label: 'Services', href: '/services' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'About us', href: '/about' },
+  { label: 'Services', href: `${company.url}/services` },
+  { label: 'Blog', href: `${company.url}/blog` },
+  { label: 'About us', href: `${company.url}/about` },
 ];
 
 export default function NotFound() {
@@ -53,21 +53,20 @@ export default function NotFound() {
             The link may be broken, or the page may have moved. Here are a few good places to pick things up again.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3" data-reveal>
-            <Button href="/">Back to home</Button>
             <Button href="/portfolio" variant="orange">
               See our work
             </Button>
-            <Button href="/contact" variant="ghost">
+            <Button href={`${company.url}/contact`} variant="ghost">
               Contact us
             </Button>
           </div>
           <ul className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm" data-reveal>
             {elsewhere.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="group inline-flex items-center gap-1.5 font-semibold text-ink-2 hover:text-ink">
+                <a href={l.href} className="group inline-flex items-center gap-1.5 font-semibold text-ink-2 hover:text-ink">
                   {l.label}
                   <Arrow className="transition-transform duration-300 group-hover:translate-x-0.5" />
-                </Link>
+                </a>
               </li>
             ))}
           </ul>

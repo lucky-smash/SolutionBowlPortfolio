@@ -43,10 +43,9 @@ export default function WorkGrid({ projects }: { projects: Project[] }) {
             type="button"
             aria-pressed={filter === f}
             onClick={() => setFilter(f)}
-            className={`tag gap-2 py-2.5 text-sm transition-colors ${filter === f ? 'bg-ink text-paper' : 'border border-[var(--line-strong)] bg-paper hover:bg-cream-2'}`}
+            className={`tag py-2.5 text-sm transition-colors ${filter === f ? 'bg-ink text-paper' : 'border border-[var(--line-strong)] bg-paper hover:bg-cream-2'}`}
           >
             {f}
-            <span className={`text-xs tabular-nums ${filter === f ? 'text-orange' : 'text-ink-2'}`}>{counts[f]}</span>
           </button>
         ))}
       </div>
