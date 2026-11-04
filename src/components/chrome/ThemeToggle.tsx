@@ -12,12 +12,13 @@ function syncThemeColor(theme: Theme) {
 }
 
 /**
- * Light / dark switch. The theme lives on <html data-theme> (restored before paint by the boot script in
- * layout.tsx), so the icon is chosen in CSS and the server render never disagrees with the client.
+ * Light / dark switch; dark is the default. The theme lives on <html data-theme> (server-rendered as dark; a saved
+ * light choice is restored before paint by the boot script in layout.tsx), so the icon is chosen in CSS and the
+ * server render never disagrees with the client.
  * Listeners can follow changes through the `sb-themechange` event on window (detail: the new theme).
  */
 export default function ThemeToggle({ className = '' }: { className?: string }) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
     const current: Theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';

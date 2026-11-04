@@ -40,16 +40,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#f4ece0',
+  themeColor: '#0f1b35',
 };
 
-// Runs before first paint: marks JS as available (so entrance states apply only when they will be animated) and
-// restores the visitor's chosen theme, so a dark page never flashes light.
-const boot = `document.documentElement.classList.add('js');try{var t=localStorage.getItem('sb-theme');if(t==='dark')document.documentElement.dataset.theme=t}catch(e){}`;
+// Dark is the default and is in the server HTML, so first paint (and no-JS) is dark. Runs before first paint:
+// marks JS as available (so entrance states apply only when they will be animated) and honours a visitor who
+// chose the light theme, so a light page never flashes dark.
+const boot = `document.documentElement.classList.add('js');try{if(localStorage.getItem('sb-theme')==='light')delete document.documentElement.dataset.theme}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable}`} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${display.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: boot }} />
       </head>
