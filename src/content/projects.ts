@@ -216,6 +216,31 @@ export const projects: Project[] = [
     image: 'AppDates3D',
     accent: '#9c0f14',
   },
+  // The two Play Store apps from "Apps Built to Scale"; their cards are drawn as apps (see appPreviews).
+  {
+    id: 'daeem',
+    name: 'Daeem',
+    sector: 'Mobile Apps',
+    sectors: ['Mobile Apps'],
+    descriptor: 'Home maintenance & service booking app',
+    region: 'Saudi Arabia',
+    summary: 'Home maintenance and professional service booking.',
+    metrics: ['1K+ users', 'Live on Google Play'],
+    url: 'https://play.google.com/store/apps/details?id=com.daeemcustomer',
+    urlLabel: 'Google Play',
+  },
+  {
+    id: 'lynkup',
+    name: 'LynkUp',
+    sector: 'Mobile Apps',
+    sectors: ['Mobile Apps'],
+    descriptor: 'Creator campaign app for F&B brands',
+    region: 'India',
+    summary: 'Connects F&B brands with content creators to run and manage campaigns.',
+    metrics: ['500+ users', 'Live on Google Play'],
+    url: 'https://play.google.com/store/apps/details?id=com.lynkupapplication.android',
+    urlLabel: 'Google Play',
+  },
   {
     id: 'atma-india',
     name: 'ATMA India',
@@ -261,9 +286,13 @@ export const sectorOrder: Sector[] = [
   'Mobile Apps',
 ];
 
+/** Apps from the live portfolio. `shots` are Play Store screens in /img/apps/<id>/s1..sN.webp, beside icon.webp. */
 export const apps = [
   {
+    id: 'dhurina',
     name: 'Dhurina',
+    color: '#f7941d',
+    shots: 6,
     sector: 'Education Technology',
     region: 'India',
     users: '5M+',
@@ -271,7 +300,10 @@ export const apps = [
     url: 'https://play.google.com/store/apps/details?id=com.dhurina',
   },
   {
+    id: 'daeem',
     name: 'Daeem',
+    color: '#e3242b',
+    shots: 5,
     sector: 'Service & Maintenance',
     region: 'Saudi Arabia',
     users: '1K+',
@@ -279,7 +311,10 @@ export const apps = [
     url: 'https://play.google.com/store/apps/details?id=com.daeemcustomer',
   },
   {
+    id: 'lynkup',
     name: 'LynkUp',
+    color: '#6d3fb3',
+    shots: 5,
     sector: 'Marketing Technology',
     region: 'India',
     users: '500+',
@@ -287,6 +322,42 @@ export const apps = [
     url: 'https://play.google.com/store/apps/details?id=com.lynkupapplication.android',
   },
 ];
+
+/** What the phone preview needs. Images live in /img/apps/<id>/: icon.webp and s1..s<shots>.webp. */
+export interface AppPreview {
+  id: string;
+  name: string;
+  color: string;
+  shots: number;
+  sector: string;
+  region: string;
+  users?: string;
+  summary: string;
+  url: string;
+  /** Label for the store / web link; Google Play by default. */
+  cta?: string;
+  /** Which screen the grid card's phone shows. */
+  cover?: number;
+}
+
+/** Projects in the grid that are apps: their card is drawn as an app and opens the phone preview. */
+export const appPreviews: Record<string, AppPreview> = {
+  dhurina: { ...apps[0], cover: 3 },
+  daeem: { ...apps[1], cover: 1 },
+  lynkup: { ...apps[2], cover: 1 },
+  appdates: {
+    id: 'appdates',
+    name: 'AppDates',
+    color: '#9c0f14',
+    shots: 3,
+    sector: 'Mobile Apps',
+    region: 'Canada',
+    summary: 'A multi-platform dating app, on mobile and the web, for a Canadian client.',
+    url: 'https://webapp.appdates.news/#/welcome-screen',
+    cta: 'Open the web app',
+    cover: 1,
+  },
+};
 
 /** The four projects the live portfolio hero highlights; they are the ones served from the bowl. */
 export const featuredIds = ['dhurina', 'livfin', 'skinmart', 'bituconnect'] as const;

@@ -1,7 +1,7 @@
 // Builds public/brand/emboss-tile.svg: a repeat tile of miniature SB symbols (the real mark, from logo-paths.ts)
 // treated as a debossed/embossed texture — cream face, a highlight up-left, a soft shade down-right.
 // One in four marks carries a muted orange face. Used as a CSS background (one request, no DOM cost).
-// Also writes emboss-tile-dark.svg: the same marks pressed into the dark theme's navy ground.
+// Also writes emboss-tile-dark.svg (the same marks pressed into the dark theme's navy ground) and emboss-relief.svg.
 import fs from 'node:fs';
 const src = fs.readFileSync('src/components/brand/logo-paths.ts', 'utf8');
 const W = +src.match(/width: (\d+)/)[1];
@@ -24,6 +24,9 @@ const PALETTES = {
   'emboss-tile.svg': { light: '#fffaf2', shade: '#d2c0a6', face: '#efe5d6', tint: '#f1d5bb' },
   // The dark theme's navy ground (#0f1b35): a lifted face, a cool highlight up-left, a deep shade down-right.
   'emboss-tile-dark.svg': { light: '#40599a', shade: '#030712', face: '#1f3160', tint: '#5a3646' },
+  // For coloured grounds (the app cards): neutral grey face, pure highlight and shade, used with mix-blend-overlay so
+  // the marks read as pressed into whatever colour sits underneath. Not named emboss-tile*, so the dark swap skips it.
+  'emboss-relief.svg': { light: '#ffffff', shade: '#000000', face: '#808080', tint: '#808080' },
 };
 const mark = (p) => ({ x, y, tint }) => `
   <g transform="translate(${x} ${y}) scale(${s.toFixed(5)})">

@@ -4,10 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
-import type { Project } from '@/content/projects';
+import { appPreviews, type AppPreview, type Project } from '@/content/projects';
 import { EASE, reducedMotion } from '@/lib/motion';
 import { Arrow } from '@/components/chrome/Nav';
 import CoverReveal from './CoverReveal';
+import LivePhone from './LivePhone';
 
 const FILTERS = ['All Projects', 'FinTech', 'Healthcare', 'E-Commerce', 'Real Estate', 'Mobile Apps', 'Enterprise'] as const;
 
@@ -22,7 +23,10 @@ export default function WorkGrid({ projects }: { projects: Project[] }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All Projects');
   const grid = useRef<HTMLUListElement>(null);
   const first = useRef(true);
-  const shown = projects.filter((p) => filter === 'All Projects' || p.sectors.includes(filter as Project['sector']));
+  // Apps lead the grid (and every filtered view); the rest keep their order.
+  const shown = projects
+    .filter((p) => filter === 'All Projects' || p.sectors.includes(filter as Project['sector']))
+    .sort((a, b) => Number(b.id in appPreviews) - Number(a.id in appPreviews));
   const counts = Object.fromEntries(FILTERS.map((f) => [f, f === 'All Projects' ? projects.length : projects.filter((p) => p.sectors.includes(f as Project['sector'])).length]));
 
   useEffect(() => {
@@ -69,27 +73,33 @@ export default function WorkGrid({ projects }: { projects: Project[] }) {
 const spanClass: Record<number, string> = { 4: 'lg:col-span-4', 5: 'lg:col-span-5', 6: 'lg:col-span-6', 7: 'lg:col-span-7' };
 
 function WorkCard({ p, tall, index }: { p: Project; tall: boolean; index: number }) {
+  const app = appPreviews[p.id];
+  const cover = (
+    <div className={`relative overflow-hidden rounded-[var(--radius)] bg-cream-2 ${tall ? 'aspect-[4/4.4]' : 'aspect-[1.36]'}`}>
+      {app ? (
+        <AppCover app={app} />
+      ) : p.image ? (
+        <Image
+          src={`/img/portfolio/${p.image}.webp`}
+          alt={`${p.name} — ${p.descriptor}`}
+          fill
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="object-cover transition-transform duration-[1200ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.05]"
+        />
+      ) : (
+        <TypePanel p={p} />
+      )}
+      {!app && p.image && p.accent && <CoverReveal accent={p.accent} index={index} />}
+      <span className="absolute bottom-4 right-4 grid size-12 translate-y-3 place-items-center rounded-full bg-ink text-paper opacity-0 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:-rotate-45 group-hover:opacity-100">
+        <Arrow />
+      </span>
+      <span className="tag absolute left-4 top-4 bg-paper/95">{p.sector}</span>
+    </div>
+  );
   return (
     <article className="group">
       <Link href={`/portfolio/${p.id}`} className="block">
-        <div className={`relative overflow-hidden rounded-[var(--radius)] bg-cream-2 ${tall ? 'aspect-[4/4.4]' : 'aspect-[1.36]'}`}>
-          {p.image ? (
-            <Image
-              src={`/img/portfolio/${p.image}.webp`}
-              alt={`${p.name} — ${p.descriptor}`}
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover transition-transform duration-[1200ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.05]"
-            />
-          ) : (
-            <TypePanel p={p} />
-          )}
-          {p.image && p.accent && <CoverReveal accent={p.accent} index={index} />}
-          <span className="absolute bottom-4 right-4 grid size-12 translate-y-3 place-items-center rounded-full bg-ink text-paper opacity-0 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:-rotate-45 group-hover:opacity-100">
-            <Arrow />
-          </span>
-          <span className="tag absolute left-4 top-4 bg-paper/95">{p.sector}</span>
-        </div>
+        {cover}
         <div className="mt-5 grid gap-x-6 gap-y-2 sm:grid-cols-[1fr_auto]">
           <h3 className="display text-[clamp(1.71rem,1.17rem+1.44vw,2.7rem)]">{p.name}</h3>
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-orange-deep sm:pt-2 sm:text-right">{p.region}</p>
@@ -104,6 +114,29 @@ function WorkCard({ p, tall, index }: { p: Project; tall: boolean; index: number
         ))}
       </ul>
     </article>
+  );
+}
+
+/** An app project's cover: its brand colour, the app icon and a live 3D phone running the app. */
+function AppCover({ app }: { app: AppPreview }) {
+  return (
+    <div
+      className="absolute inset-0 overflow-hidden text-[#fff]"
+      style={{ background: `radial-gradient(110% 90% at 78% 30%, color-mix(in oklab, ${app.color} 75%, white), ${app.color} 38%, color-mix(in oklab, ${app.color} 28%, black) 100%)` }}
+    >
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/emboss-relief.svg')] bg-[length:168px_148px] opacity-35 mix-blend-overlay" />
+      <LivePhone app={app} poster={app.cover} className="!absolute inset-y-0 right-0 w-[60%]" />
+      <div className="pointer-events-none absolute bottom-[8%] left-[7%] flex max-w-[40%] flex-col items-start gap-3">
+        <span className="block size-[clamp(3.75rem,6.5vw,5.5rem)] overflow-hidden rounded-[22%] shadow-[0_18px_40px_-12px_rgb(0_0_0/0.55)] ring-1 ring-[#ffffff4d] motion-safe:group-hover:animate-[jiggle_0.32s_ease-in-out_infinite]">
+          <Image src={`/img/apps/${app.id}/icon.webp`} alt="" width={88} height={88} className="size-full object-cover" />
+        </span>
+        <span className="display text-[clamp(1.3rem,0.9rem+1.3vw,2rem)] leading-none drop-shadow">{app.name}</span>
+        <span className="inline-flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.14em] backdrop-blur">
+          <span className="size-1.5 rounded-full bg-[#4ade80] motion-safe:animate-pulse" />
+          {app.users ? `${app.users} users` : 'Live app'}
+        </span>
+      </div>
+    </div>
   );
 }
 

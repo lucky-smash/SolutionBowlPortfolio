@@ -328,6 +328,17 @@ html.theme-switching *::after {
     transform: translate3d(-50%, 0, 0);
   }
 }
+
+/* iOS edit-mode wobble for app icons (app cards in the project grid). */
+@keyframes jiggle {
+  0%,
+  100% {
+    transform: rotate(-3.5deg);
+  }
+  50% {
+    transform: rotate(3.5deg) translateY(-1px);
+  }
+}
 .marquee-track {
   animation: marquee var(--marquee-speed, 38s) linear infinite;
 }
