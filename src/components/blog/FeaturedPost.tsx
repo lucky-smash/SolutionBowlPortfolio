@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import type { PostSummary } from './utils';
 
 /** The featured article as one big orange colour block: a magazine cover more than a card. */

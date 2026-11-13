@@ -6,7 +6,7 @@ import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
 import { FinalCta } from '@/components/home/Sections';
 import { TypePanel } from '@/components/portfolio/WorkGrid';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import JsonLd from '@/components/seo/JsonLd';
 import { getProject, projects } from '@/content/projects';
 import { absoluteUrl, breadcrumbJsonLd, pageMeta } from '@/lib/seo';

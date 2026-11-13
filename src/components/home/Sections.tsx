@@ -6,7 +6,7 @@ import ProcessPath from './ProcessPath';
 import MarqueeToggle from '@/components/ui/MarqueeToggle';
 import { aboutPage, homeExtras } from '@/content/company';
 import { company, headlineStats } from '@/content/site';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 
 /** "What we believe": the About statement, filling with ink as it is read. */
 export function Statement() {

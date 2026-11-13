@@ -3,7 +3,7 @@ import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
 import SectionHead from '@/components/ui/SectionHead';
 import HeadlineTags, { type TagSpec } from '@/components/home/HeadlineTags';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { aboutPage } from '@/content/company';
 import JourneyTrack from './JourneyTrack';
 import { pad, teamPhoto } from './media';

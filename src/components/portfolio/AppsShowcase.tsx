@@ -1,4 +1,4 @@
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import type { AppPreview } from '@/content/projects';
 import LivePhone from './LivePhone';
 

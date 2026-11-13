@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
 import { appPreviews, kindFilters, sectorOrder, type AppPreview, type Kind, type Project, type Sector } from '@/content/projects';
 import { EASE, reducedMotion } from '@/lib/motion';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import CoverReveal from './CoverReveal';
 import LivePhone from './LivePhone';
 

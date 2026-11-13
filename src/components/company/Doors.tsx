@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import SectionHead from '@/components/ui/SectionHead';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 
 type Door = { label: string; title: string; body: string; href: string; cta?: string };
 

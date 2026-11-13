@@ -5,7 +5,7 @@ import { animate } from 'animejs';
 import { contactPage } from '@/content/company';
 import { contact } from '@/content/site';
 import { EASE, reducedMotion } from '@/lib/motion';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 
 const f = contactPage.form;
 type Status = 'idle' | 'sending' | 'sent' | 'fallback' | 'error';

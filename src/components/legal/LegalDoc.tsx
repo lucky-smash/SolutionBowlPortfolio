@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { contact } from '@/content/site';
 import type { LegalPage } from '@/content/types';
 import LegalIndex from './LegalIndex';

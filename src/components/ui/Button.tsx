@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 
 type Variant = 'ink' | 'orange' | 'ghost' | 'paper';
 

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Lines from '@/components/ui/Lines';
 import SectionHead from '@/components/ui/SectionHead';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { teamPage } from '@/content/company';
 import TeamGrid from './TeamGrid';
 import { teamPhoto } from './media';

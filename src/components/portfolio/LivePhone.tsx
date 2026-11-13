@@ -11,6 +11,24 @@ import type { PhoneApp, PhoneController } from './phoneScene';
 export default function LivePhone({ app, poster = 1, className = '' }: { app: PhoneApp; poster?: number; className?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  // The still phone's screenshot is fetched only when the card is near, not by native lazy-loading (which on
+  // mobile starts 1250-2500px early and put these images ahead of the hero's LCP).
+  const [near, setNear] = useState(false);
+
+  useEffect(() => {
+    const el = host.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setNear(true);
+        io.disconnect();
+      },
+      { rootMargin: '400px 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = host.current;
@@ -54,7 +72,9 @@ export default function LivePhone({ app, poster = 1, className = '' }: { app: Ph
       <div
         className={`pointer-events-none absolute left-1/2 top-1/2 aspect-[0.78] h-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] rounded-[10%/8%] bg-[#2a2b30] p-[2.6%] shadow-[0_30px_50px_-20px_rgb(0_0_0/0.6)] transition-opacity duration-700 ${ready ? 'opacity-0' : 'opacity-100'}`}
       >
-        <img src={app.site ? (app.site.phone ?? app.site.wide) : `/img/apps/${app.id}/s${poster}.webp`} alt="" className="size-full rounded-[8%/6%] bg-[#fff] object-cover object-top" loading="lazy" />
+        {near && (
+          <img src={app.site ? (app.site.phone ?? app.site.wide) : `/img/apps/${app.id}/s${poster}.webp`} alt="" className="size-full rounded-[8%/6%] bg-[#fff] object-cover object-top" decoding="async" />
+        )}
       </div>
     </div>
   );

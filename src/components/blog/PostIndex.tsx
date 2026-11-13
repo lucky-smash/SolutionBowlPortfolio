@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { DUR, EASE, reducedMotion } from '@/lib/motion';
 import type { ReactNode } from 'react';
 import type { PostSummary } from './utils';

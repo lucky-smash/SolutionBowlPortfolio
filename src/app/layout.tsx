@@ -33,7 +33,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(company.url),
   title: { default: home.meta.title, template: '%s' },
   description: home.meta.description,
-  icons: { icon: '/brand/favicon.ico', apple: '/brand/sb-symbol-512.png' },
+  // 48px PNG (2.6 KB): the old favicon.ico was a 42 KB 180px PNG fetched before first paint.
+  icons: { icon: { url: '/brand/favicon-48.png', type: 'image/png', sizes: '48x48' }, apple: '/brand/sb-symbol-512.png' },
   openGraph: { siteName: 'SolutionBowl', type: 'website', locale: 'en_US', images: [OG_IMAGE] },
   twitter: { card: 'summary_large_image', images: [OG_IMAGE] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 } },

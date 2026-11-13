@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
 import SectionHead from '@/components/ui/SectionHead';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { lifePage, teamPage } from '@/content/company';
 import { lifePhoto, teamPhoto } from './media';
 

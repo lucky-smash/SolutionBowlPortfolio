@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Logo from '@/components/brand/Logo';
 import { company, contact, nav, offices, socials } from '@/content/site';
-import { Arrow } from './Nav';
+import { Arrow } from './Arrow';
 
 /** Everything except the portfolio lives on the main site. */
 const onMainSite = (href: string) => (href.startsWith('/portfolio') ? href : `${company.url}${href}`);

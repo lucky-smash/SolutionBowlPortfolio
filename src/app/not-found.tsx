@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { company } from '@/content/site';
 
 export const metadata: Metadata = {

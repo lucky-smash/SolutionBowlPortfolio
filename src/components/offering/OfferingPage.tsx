@@ -6,7 +6,7 @@ import SectionHead from '@/components/ui/SectionHead';
 import ProcessPath from '@/components/home/ProcessPath';
 import Testimonials from '@/components/home/Testimonials';
 import { Faqs, FinalCta } from '@/components/home/Sections';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import { toLines } from '@/lib/text';
 
 export type Crumb = { label: string; href?: string };

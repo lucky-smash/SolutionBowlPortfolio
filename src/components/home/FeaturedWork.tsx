@@ -4,7 +4,7 @@ import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
 import { featuredIds, getProject, highlights, portfolioIntro } from '@/content/projects';
 import { home } from '@/content/site';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import CoverReveal from '@/components/portfolio/CoverReveal';
 
 export const featuredProjects = featuredIds.map((id) => ({ ...getProject(id)!, ...highlights[id] }));

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
 import Logo from '@/components/brand/Logo';
+import { Arrow } from '@/components/chrome/Arrow';
 import ThemeToggle from '@/components/chrome/ThemeToggle';
 import { nav } from '@/content/site';
 import { reducedMotion, EASE } from '@/lib/motion';
@@ -340,13 +341,5 @@ function PanelLink({ href, active, children }: { href: string; active: boolean; 
         <Arrow />
       </span>
     </Link>
-  );
-}
-
-export function Arrow({ className }: { className?: string }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className={className}>
-      <path d="M2 7h10M8 3l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 }

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
 import HeadlineTags, { type TagSpec } from '@/components/home/HeadlineTags';
@@ -19,7 +20,7 @@ export default function PortfolioHero() {
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/emboss-tile.svg')] bg-[length:168px_148px] opacity-50 [mask-image:radial-gradient(120%_80%_at_100%_0%,#000_10%,transparent_60%)]" />
       <div data-stage-avoid className="wrap relative z-10">
         <div className="relative pt-2 mt-[clamp(1rem,3vh,2.5rem)] @container lg:max-w-[52rem]">
-          <Lines as="h1" id="portfolio-title" lines={['Our Work.', 'Their Impact.']} className="display relative text-[clamp(2.4rem,11cqw,7.4rem)]" lineClassName={(i) => (i === 1 ? 'text-orange-ink' : '')}>
+          <Lines as="h1" id="portfolio-title" enter lines={['Our Work.', 'Their Impact.']} className="display relative text-[clamp(2.4rem,11cqw,7.4rem)]" lineClassName={(i) => (i === 1 ? 'text-orange-ink' : '')}>
             <HeadlineTags tags={TAGS} />
           </Lines>
         </div>
@@ -32,10 +33,10 @@ export default function PortfolioHero() {
 
       <div data-stage-avoid className="wrap relative z-10">
         <div className="mt-2 max-w-[30rem] pb-8 lg:mt-9 lg:pb-0 lg:max-w-[min(30rem,40vw)]">
-          <p className="lede" data-reveal>
+          <p className="lede" data-enter-fade style={{ '--d': '220ms' } as CSSProperties}>
             {portfolioIntro.tagline} {portfolioIntro.claim}
           </p>
-          <div className="mt-6 flex flex-wrap gap-3" data-reveal>
+          <div className="mt-6 flex flex-wrap gap-3" data-enter-fade style={{ '--d': '340ms' } as CSSProperties}>
             <Button href="#featured">Explore Our Work</Button>
             <Button href={`${company.url}/contact`} variant="ghost">
               Start a Project

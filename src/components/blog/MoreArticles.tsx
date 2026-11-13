@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Lines from '@/components/ui/Lines';
 import Button from '@/components/ui/Button';
-import { Arrow } from '@/components/chrome/Nav';
+import { Arrow } from '@/components/chrome/Arrow';
 import type { PostSummary } from './utils';
 
 const tones = ['bg-ink text-paper', 'bg-paper text-ink', 'bg-orange text-ink'];
