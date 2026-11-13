@@ -27,7 +27,7 @@
 
 ## Client Success Stories ("Our Work. Their Impact.")
 
-**Filters:** All Projects · FinTech · Healthcare · E-Commerce · Real Estate · Mobile Apps · Enterprise
+**Filters:** All Projects · Our Apps · SaaS · Services, with an Industry sub-filter (FinTech · Healthcare · E-Commerce · Real Estate · Enterprise · EdTech · Supply Chain · Media) showing only industries present in the chosen type
 
 ### Summary Table
 

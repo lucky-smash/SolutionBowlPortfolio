@@ -15,7 +15,7 @@ const TAGS: TagSpec[] = [
 /** Same stage as the home hero, so the portfolio reads as the continuation of that story. */
 export default function PortfolioHero() {
   return (
-    <section aria-labelledby="portfolio-title" className="relative flex min-h-[max(100svh,46rem)] flex-col overflow-hidden pt-[calc(var(--header-h)+0.75rem)]">
+    <section aria-labelledby="portfolio-title" className="relative flex min-h-[max(100svh,46rem)] flex-col lg:min-h-[max(70svh,38rem)] overflow-hidden pt-[calc(var(--header-h)+0.75rem)]">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url('/brand/emboss-tile.svg')] bg-[length:168px_148px] opacity-50 [mask-image:radial-gradient(120%_80%_at_100%_0%,#000_10%,transparent_60%)]" />
       <div data-stage-avoid className="wrap relative z-10">
         <div className="relative pt-2 mt-[clamp(1rem,3vh,2.5rem)] @container lg:max-w-[52rem]">

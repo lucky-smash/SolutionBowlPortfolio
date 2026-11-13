@@ -44,7 +44,7 @@ export default function PortfolioPage() {
       {/* Every project, laid out as an editorial spread. */}
       <section id="work" aria-labelledby="all-work" className="scroll-mt-24 py-[var(--section)]">
         <div className="wrap">
-          <SectionHead id="all-work" eyebrow="Client success stories" title={['All', 'Projects']} accentLine={1} intro={portfolioIntro.tagline} />
+          <SectionHead id="all-work" eyebrow="Client success stories" title={['All', 'Projects']} accentLine={1} />
           <div className="mt-12">
             <WorkGrid projects={projects} />
           </div>

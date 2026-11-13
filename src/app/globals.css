@@ -95,6 +95,32 @@ html[data-theme="dark"] {
   --line-strong: color-mix(in oklab, var(--color-ink) 22%, transparent);
   color-scheme: dark;
 }
+/* Trial (OrangeToggle): the logo orange #f58634 in place of the live site's #f25c2e… */
+html[data-theme="dark"]:is([data-orange="logo"], [data-orange="brand"]) {
+  --color-orange: #f58634;
+  --color-orange-ink: #f58634;
+  --color-orange-deep: #f7944b;
+  --color-orange-hover: #f7944b;
+}
+/* …and 'brand' adds the logo's grey #848688: secondary text, muted marks and lines go from blue-grey to the
+   logo's neutral grey family (lightened for text on navy: ink-2 9.8, ink-3 6.4). */
+html[data-theme="dark"][data-orange="brand"] {
+  --color-ink-2: #c3c4c6;
+  --color-ink-3: #9d9fa1;
+  --color-grey: #848688;
+  --line: color-mix(in oklab, #848688 34%, transparent);
+  --line-strong: color-mix(in oklab, #848688 60%, transparent);
+}
+/* The logo pairs an orange S with a grey B; 'brand' sets two-tone headings the same way (grey line + orange line,
+   #848688 on navy is 4.6:1, fine for display type) and gives dark tags and selected capsules the logo grey. */
+html[data-theme="dark"][data-orange="brand"] :is(h1, h2):has(.text-orange-ink) .line-inner:not(.text-orange-ink) {
+  color: #848688;
+}
+html[data-theme="dark"][data-orange="brand"] :is(.tag.bg-ink, [aria-pressed="true"].bg-ink) {
+  background-color: #848688;
+  --color-paper: #ffffff;
+  box-shadow: none;
+}
 
 /* Surfaces that are dark in the light theme stay dark (navy-dark, light type on them) instead of inverting. */
 html[data-theme="dark"] :is(.bg-ink, .bg-night, [class^="bg-ink/"], [class*=" bg-ink/"]) {

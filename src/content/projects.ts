@@ -1,6 +1,8 @@
 // Portfolio content as published on https://www.solutionbowl.ai/portfolio (retrieved 2026-10-29).
 // Names, descriptions, metrics and links mirror the live page; see PORTFOLIO.md (the source of truth) for notes.
 
+import type { PhoneApp } from '@/components/portfolio/phoneScene';
+
 export const SITE = 'https://www.solutionbowl.ai';
 
 export type Sector =
@@ -14,9 +16,21 @@ export type Sector =
   | 'Media'
   | 'Mobile Apps';
 
+/** What we built: the top-level portfolio filter. Sectors (industries) refine within it. */
+export type Kind = 'App' | 'SaaS' | 'Service';
+
+/** Top-level filter capsules, in order, with their labels. */
+export const kindFilters: { kind: Kind; label: string }[] = [
+  { kind: 'App', label: 'Our Apps' },
+  { kind: 'SaaS', label: 'SaaS' },
+  { kind: 'Service', label: 'Services' },
+];
+
 export interface Project {
   id: string;
   name: string;
+  /** What we built: an app, a SaaS platform, or a site/service build. */
+  kind: Kind;
   /** Primary sector, shown as the card tag. */
   sector: Sector;
   /** All sectors the project is filterable under. */
@@ -40,6 +54,7 @@ export const projects: Project[] = [
   {
     id: 'dhurina',
     name: 'Dhurina',
+    kind: 'App',
     sector: 'EdTech',
     sectors: ['EdTech', 'Mobile Apps'],
     descriptor: 'Competitive exam preparation app',
@@ -56,6 +71,7 @@ export const projects: Project[] = [
   {
     id: 'livfin',
     name: 'LivFin',
+    kind: 'SaaS',
     sector: 'FinTech',
     sectors: ['FinTech', 'Supply Chain'],
     descriptor: 'Supply chain finance platform',
@@ -71,6 +87,7 @@ export const projects: Project[] = [
   {
     id: 'skinmart',
     name: 'Skinmart',
+    kind: 'Service',
     sector: 'E-Commerce',
     sectors: ['E-Commerce'],
     descriptor: 'Skincare e-commerce store',
@@ -86,6 +103,7 @@ export const projects: Project[] = [
   {
     id: 'bituconnect',
     name: 'BituConnect',
+    kind: 'SaaS',
     sector: 'Supply Chain',
     sectors: ['Supply Chain'],
     descriptor: 'Global procurement & trading platform',
@@ -101,6 +119,7 @@ export const projects: Project[] = [
   {
     id: 'inspire-mental-fitness',
     name: 'Inspire Mental Fitness',
+    kind: 'SaaS',
     sector: 'Healthcare',
     sectors: ['Healthcare'],
     descriptor: 'Mental wellness platform',
@@ -116,6 +135,7 @@ export const projects: Project[] = [
   {
     id: 'joyfirst-india',
     name: 'JoyFirst India',
+    kind: 'Service',
     sector: 'Real Estate',
     sectors: ['Real Estate'],
     descriptor: 'Real estate & PropTech platform',
@@ -131,6 +151,7 @@ export const projects: Project[] = [
   {
     id: 'wirhe',
     name: 'WIRhE',
+    kind: 'Service',
     sector: 'Healthcare',
     sectors: ['Healthcare'],
     descriptor: 'Global public-health foundation',
@@ -146,6 +167,7 @@ export const projects: Project[] = [
   {
     id: 'tap-n-go',
     name: 'Tap-N-Go',
+    kind: 'SaaS',
     sector: 'Enterprise',
     sectors: ['Enterprise'],
     descriptor: 'Service management SaaS',
@@ -160,6 +182,7 @@ export const projects: Project[] = [
   {
     id: 'hki-media',
     name: 'HKI Media',
+    kind: 'Service',
     sector: 'Media',
     sectors: ['Media'],
     descriptor: 'Digital media platform',
@@ -175,6 +198,7 @@ export const projects: Project[] = [
   {
     id: 'er-counseling',
     name: 'ER Counseling',
+    kind: 'Service',
     sector: 'Healthcare',
     sectors: ['Healthcare'],
     descriptor: 'Online therapy practice',
@@ -190,6 +214,7 @@ export const projects: Project[] = [
   {
     id: 'jm-cadworx',
     name: 'JM CADWORX',
+    kind: 'Service',
     sector: 'E-Commerce',
     sectors: ['E-Commerce'],
     descriptor: 'CAD drafting & design service',
@@ -205,6 +230,7 @@ export const projects: Project[] = [
   {
     id: 'appdates',
     name: 'AppDates',
+    kind: 'App',
     sector: 'Mobile Apps',
     sectors: ['Mobile Apps'],
     descriptor: 'Cross-platform dating app',
@@ -220,6 +246,7 @@ export const projects: Project[] = [
   {
     id: 'daeem',
     name: 'Daeem',
+    kind: 'App',
     sector: 'Mobile Apps',
     sectors: ['Mobile Apps'],
     descriptor: 'Home maintenance & service booking app',
@@ -232,6 +259,7 @@ export const projects: Project[] = [
   {
     id: 'lynkup',
     name: 'LynkUp',
+    kind: 'App',
     sector: 'Mobile Apps',
     sectors: ['Mobile Apps'],
     descriptor: 'Creator campaign app for F&B brands',
@@ -244,6 +272,7 @@ export const projects: Project[] = [
   {
     id: 'atma-india',
     name: 'ATMA India',
+    kind: 'Service',
     sector: 'Enterprise',
     sectors: ['Enterprise'],
     descriptor: 'Industry association website',
@@ -259,6 +288,7 @@ export const projects: Project[] = [
   {
     id: 'droneplanet',
     name: 'DronePlanet',
+    kind: 'SaaS',
     sector: 'Enterprise',
     sectors: ['Enterprise'],
     descriptor: 'B2B drone services marketplace',
@@ -273,17 +303,19 @@ export const projects: Project[] = [
   },
 ];
 
-/** Filter order; only sectors that have at least one project are rendered. */
+/**
+ * Industry sub-filter order; only sectors with at least one project in the current kind are rendered.
+ * 'Mobile Apps' is not listed: it is a kind of build (see Kind), not an industry.
+ */
 export const sectorOrder: Sector[] = [
-  'EdTech',
   'FinTech',
-  'Supply Chain',
-  'E-Commerce',
   'Healthcare',
+  'E-Commerce',
   'Real Estate',
   'Enterprise',
+  'EdTech',
+  'Supply Chain',
   'Media',
-  'Mobile Apps',
 ];
 
 /** Apps from the live portfolio. `shots` are Play Store screens in /img/apps/<id>/s1..sN.webp, beside icon.webp. */
@@ -367,6 +399,37 @@ export const highlights: Record<(typeof featuredIds)[number], { sector: string; 
   livfin: { sector: 'FinTech', highlight: '₹500Cr+ Disbursed' },
   skinmart: { sector: 'eCommerce', highlight: 'Australia' },
   bituconnect: { sector: 'Supply Chain', highlight: 'UAE' },
+};
+/**
+ * What the phone in each featured card runs: Dhurina its app; the websites their own pages (Skinmart from live
+ * mobile and tablet captures; LivFin and BituConnect from their published renders, flattened, on the big screen).
+ */
+export const featuredPhones: Record<(typeof featuredIds)[number], PhoneApp> = {
+  dhurina: { id: 'dhurina', name: 'Dhurina', color: '#f7941d', shots: 6 },
+  livfin: {
+    id: 'livfin',
+    name: 'LivFin',
+    color: '#0f5a47',
+    shots: 0,
+    icon: '/img/sites/livfin/icon.webp',
+    site: { label: 'livfin.com', wide: '/img/sites/livfin/wide.webp' },
+  },
+  skinmart: {
+    id: 'skinmart',
+    name: 'Skinmart',
+    color: '#d27a55',
+    shots: 0,
+    icon: '/img/sites/skinmart/icon.webp',
+    site: { label: 'skinmart.com.au', phone: '/img/sites/skinmart/phone.webp', wide: '/img/sites/skinmart/wide.webp' },
+  },
+  bituconnect: {
+    id: 'bituconnect',
+    name: 'BituConnect',
+    color: '#2f7fd8',
+    shots: 0,
+    icon: '/img/sites/bituconnect/icon.webp',
+    site: { label: 'bituconnect.com', wide: '/img/sites/bituconnect/wide.webp' },
+  },
 };
 export const getProject = (id: string) => projects.find((p) => p.id === id);
 export const portfolioIntro = {

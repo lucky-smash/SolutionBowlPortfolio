@@ -4,8 +4,22 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { clone as cloneSkinned } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import gsap from 'gsap';
+import { CustomEase } from 'gsap/CustomEase';
+import { CustomWiggle } from 'gsap/CustomWiggle';
 
-export type PhoneApp = { id: string; name: string; color: string; shots: number };
+/**
+ * What the phone runs. An app plays its store screens (/img/apps/<id>/s1..sN.webp). A website (`site`) opens in a
+ * browser instead: `phone` is a tall mobile capture scrolled on the folded cover screen, `wide` the tablet/desktop
+ * page shown on the unfolded inner screen. Without `phone`, the site launches and goes straight to the big screen.
+ */
+export type PhoneApp = {
+  id: string;
+  name: string;
+  color: string;
+  shots: number;
+  icon?: string;
+  site?: { label: string; wide: string; phone?: string };
+};
 export type PhoneController = { setActive(on: boolean): void; dispose(): void };
 
 const MODEL_URL = '/models/phone.glb';
@@ -17,6 +31,26 @@ const PHONE_H = 1.52; // world height the model is scaled to
 const BASE_YAW = -0.36; // a three-quarter view shows the frame
 const CW = 540; // screen canvas width; height follows the display's aspect
 const FONT = 'system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif';
+
+/*
+ * Motion curves, shaped after the real thing (made once, shared by every phone):
+ * - hingeOpen: the hinge's friction holds it for a moment, it swings through, then eases into the flat stop.
+ * - hingeShut: closes steadily, then the magnets snap it shut over the last few degrees.
+ * - flick: a finger swipe, a short drag that is let go and glides to rest.
+ * - launch: an app zooming open from its icon (critically damped, no bounce).
+ * - settle: the damped wobble of a hand-held phone after the hinge clicks into place.
+ */
+let easesReady = false;
+function registerEases() {
+  if (easesReady) return;
+  easesReady = true;
+  gsap.registerPlugin(CustomEase, CustomWiggle);
+  CustomEase.create('sb.hingeOpen', 'M0,0 C0.26,0 0.3,0.12 0.44,0.38 0.58,0.64 0.72,0.92 0.84,0.98 0.88,1 0.94,1 1,1');
+  CustomEase.create('sb.hingeShut', 'M0,0 C0.2,0.02 0.42,0.42 0.62,0.66 0.76,0.82 0.86,0.88 1,1');
+  CustomEase.create('sb.flick', 'M0,0 C0.24,0.04 0.26,0.62 0.42,0.84 0.56,1 0.76,1 1,1');
+  CustomEase.create('sb.launch', 'M0,0 C0.16,0.5 0.22,0.9 0.42,0.97 0.6,1 0.8,1 1,1');
+  CustomWiggle.create('sb.settle', { wiggles: 3, type: 'easeOut' });
+}
 
 /* The model is fetched and decoded once, then cloned per card. */
 let modelPromise: Promise<GLTF> | null = null;
@@ -136,6 +170,7 @@ function lightUp(mesh: THREE.Mesh, tex: THREE.Texture) {
 export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduced: boolean }): Promise<PhoneController> {
   const gltf = await loadModel();
   const { reduced } = opts;
+  registerEases();
   const small = window.matchMedia('(max-width: 767px)').matches;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -230,12 +265,15 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
   /** Places the model for a fold amount: hinge pose, a turn from the cover screen to the inner one, re-centred. */
   const tmpC = new THREE.Vector3();
   let lastFold = -1;
-  const applyFold = (f: number) => {
-    if (f === lastFold) return;
+  let lastTurn = -1;
+  /** `f` drives the hinge; `turn` the hand turning the phone to face you, which trails the hinge a little. */
+  const applyFold = (f: number, turn = f) => {
+    if (f === lastFold && turn === lastTurn) return;
+    if (f !== lastFold) pose(f);
     lastFold = f;
-    pose(f);
-    orient.quaternion.slerpQuaternions(shut.q, open.q, f);
-    tmpC.lerpVectors(shutFrame.center, openFrame.center, f);
+    lastTurn = turn;
+    orient.quaternion.slerpQuaternions(shut.q, open.q, turn);
+    tmpC.lerpVectors(shutFrame.center, openFrame.center, turn);
     orient.position.copy(tmpC).multiplyScalar(-1);
   };
   applyFold(0);
@@ -288,8 +326,12 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
     img.src = src;
     return img;
   };
-  const icon = load(`/img/apps/${app.id}/icon.webp`);
+  const icon = load(app.icon ?? `/img/apps/${app.id}/icon.webp`);
   const shots = Array.from({ length: app.shots }, (_, i) => load(`/img/apps/${app.id}/s${i + 1}.webp`));
+  const site = app.site;
+  const sitePhone = site?.phone ? load(site.phone) : null;
+  const siteWide = site ? load(site.wide) : null;
+  const SITE_STEPS = 2; // scroll stops on each screen
   const ready = (img: HTMLImageElement) => img.complete && img.naturalWidth > 0;
 
   const probe = document.createElement('canvas');
@@ -314,7 +356,7 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
   };
 
   // Tweened by GSAP, read by draw().
-  const st = { open: reduced ? 1 : 0, slide: reduced ? 1 : 0, press: 1, touch: 0, jiggle: reduced ? 0 : 1, fold: 0, inner: 0 };
+  const st = { open: reduced ? 1 : 0, slide: reduced ? 1 : 0, press: 1, touch: 0, jiggle: reduced ? 0 : 1, fold: 0, turn: 0, zoom: 0, wob: 0, inner: 0 };
 
   const GHOSTS: { label: string; from: string; to: string; glyph: number }[] = [
     { label: 'Calendar', from: '#ffffff', to: '#e9e9ee', glyph: 5 },
@@ -531,16 +573,19 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
         const iw = img.naturalWidth;
         const ih = img.naturalHeight;
         if (ih / iw > CH / CW) {
-          const cover = Math.max(CW / iw, CH / ih);
-          o.filter = 'blur(22px) saturate(1.2)';
-          o.drawImage(img, (CW - iw * cover) / 2, (CH - ih * cover) / 2, iw * cover, ih * cover);
-          o.filter = 'none';
-          o.fillStyle = 'rgba(0,0,0,0.28)';
-          o.fillRect(0, 0, CW, CH);
-          const dw = iw * (CH / ih);
-          o.shadowColor = 'rgba(0,0,0,0.35)';
-          o.shadowBlur = 24;
-          o.drawImage(img, (CW - dw) / 2, 0, dw, CH);
+          // Taller than the display: fill nearly its full width (trimming a little off the bottom, where store
+          // shots carry least), then carry the image's own left and right pixel columns out to the edges, so its
+          // background simply continues. No blurred copy, no dimming, no visible seam.
+          const s = Math.max(CH / ih, (CW * 0.86) / iw);
+          const dw = iw * s;
+          const dh = ih * s;
+          const dx = (CW - dw) / 2;
+          const dy = -Math.max(0, dh - CH) * 0.45;
+          if (dx > 0) {
+            o.drawImage(img, 0, 0, 2, ih, 0, dy, Math.ceil(dx) + 1, dh);
+            o.drawImage(img, iw - 2, 0, 2, ih, Math.floor(dx + dw) - 1, dy, Math.ceil(dx) + 1, dh);
+          }
+          o.drawImage(img, dx, dy, dw, dh);
         } else {
           const e = edges(img);
           const dh = (CW * ih) / iw;
@@ -557,14 +602,81 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
     ctx.restore();
   }
 
+  /**
+   * A page in a browser: an address bar with the site's domain under the status bar, then the page, filling the
+   * width and scrolled by `scroll` (0 top .. 1 as far as it goes). Pages shorter than the view fill its height.
+   */
+  function browserView(c: CanvasRenderingContext2D, w: number, h: number, top: number, img: HTMLImageElement | null, scroll: number) {
+    c.fillStyle = '#ffffff';
+    c.fillRect(0, 0, w, h);
+    const bh = Math.round(w * 0.1);
+    const pill = { x: w * 0.06, y: top + bh * 0.16, w: w * 0.88, h: bh * 0.68 };
+    c.fillStyle = '#eceef2';
+    rr(c, pill.x, pill.y, pill.w, pill.h, pill.h / 2);
+    c.fill();
+    const fs = Math.round(pill.h * 0.44);
+    c.font = `500 ${fs}px ${FONT}`;
+    c.textBaseline = 'middle';
+    c.textAlign = 'center';
+    c.fillStyle = '#1c1c1e';
+    const text = site?.label ?? app.name;
+    const tw = c.measureText(text).width;
+    c.fillText(text, w / 2 + fs * 0.45, pill.y + pill.h / 2);
+    // padlock
+    const lx = w / 2 - tw / 2 - fs * 0.5;
+    const ly = pill.y + pill.h / 2;
+    c.fillStyle = '#6b6f78';
+    rr(c, lx - fs * 0.3, ly - fs * 0.05, fs * 0.6, fs * 0.46, fs * 0.08);
+    c.fill();
+    c.strokeStyle = '#6b6f78';
+    c.lineWidth = Math.max(1.5, fs * 0.09);
+    c.beginPath();
+    c.arc(lx, ly - fs * 0.07, fs * 0.19, Math.PI, 0);
+    c.stroke();
+    c.textAlign = 'left';
+    c.textBaseline = 'alphabetic';
+    const y0 = top + bh;
+    const vh = h - y0;
+    if (img && ready(img)) {
+      const sc = Math.max(w / img.naturalWidth, vh / img.naturalHeight);
+      const dw = img.naturalWidth * sc;
+      const dh = img.naturalHeight * sc;
+      c.save();
+      c.beginPath();
+      c.rect(0, y0, w, vh);
+      c.clip();
+      c.drawImage(img, (w - dw) / 2, y0 - Math.max(0, dh - vh) * Math.min(1, Math.max(0, scroll)), dw, dh);
+      c.restore();
+    }
+    c.fillStyle = 'rgba(0,0,0,0.08)';
+    c.fillRect(0, y0, w, 1.5);
+  }
+
   function inApp() {
+    if (site) {
+      if (sitePhone) {
+        browserView(ctx, CW, CH, 64, sitePhone, st.slide / SITE_STEPS);
+        statusBar('#111');
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        rr(ctx, CW / 2 - 70, CH - 18, 140, 6, 3);
+        ctx.fill();
+      } else {
+        frame(0, 0); // the launch screen; the site itself opens on the big screen
+        statusBar('#fff');
+      }
+      return;
+    }
     const s = st.slide;
     const i = Math.floor(s);
     const f = s - i;
     frame(i, -f * CW);
     if (f > 0.0001) frame(i + 1, (1 - f) * CW);
-    ctx.fillStyle = 'rgba(0,0,0,0.18)';
-    ctx.fillRect(0, 0, CW, 72);
+    // a soft fade behind the status bar (not a hard band) so its white icons read on light screens
+    const shade = ctx.createLinearGradient(0, 0, 0, 96);
+    shade.addColorStop(0, 'rgba(0,0,0,0.22)');
+    shade.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, CW, 96);
     statusBar('#fff');
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     rr(ctx, CW / 2 - 70, CH - 18, 140, 6, 3);
@@ -606,6 +718,21 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
   function drawInner() {
     if (!itex) return;
     const c = ictx;
+    if (site) {
+      const sb = Math.round(IH * 0.07);
+      browserView(c, IW, IH, sb, siteWide ?? sitePhone, st.inner / SITE_STEPS);
+      c.fillStyle = '#111';
+      c.textBaseline = 'middle';
+      c.font = `600 ${Math.round(sb * 0.42)}px ${FONT}`;
+      c.fillText('9:41', IW * 0.035, sb * 0.6);
+      for (let i = 0; i < 4; i++) rr(c, IW * 0.9 + i * sb * 0.17, sb * 0.76 - (i + 1) * sb * 0.08, sb * 0.11, (i + 1) * sb * 0.08, 2), c.fill();
+      c.textBaseline = 'alphabetic';
+      c.fillStyle = 'rgba(0,0,0,0.7)';
+      rr(c, IW / 2 - IW * 0.08, IH - 14, IW * 0.16, 5, 2.5);
+      c.fill();
+      itex.needsUpdate = true;
+      return;
+    }
     const g = c.createLinearGradient(0, 0, IW, IH);
     g.addColorStop(0, app.color);
     g.addColorStop(0.6, deep);
@@ -689,33 +816,44 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
 
     const loop = gsap.timeline({ repeat: -1, delay: 0.8, paused: true });
     loop
-      .set(st, { open: 0, slide: 0, press: 1, touch: 0, jiggle: 1, fold: 0, inner: 0 })
+      .set(st, { open: 0, slide: 0, press: 1, touch: 0, jiggle: 1, fold: 0, turn: 0, zoom: 0, wob: 0, inner: 0 })
       .to(st, { jiggle: 0, duration: 0.35, ease: 'power1.out' }, 2.4)
       .to(st, { touch: 1, duration: 0.12, ease: 'power2.out' }, 2.55)
-      .to(st, { press: 0.9, duration: 0.12, ease: 'power2.out' }, 2.55)
-      .to(st, { press: 1, duration: 0.3, ease: 'power2.out' }, 2.72)
+      .to(st, { press: 0.88, duration: 0.12, ease: 'power2.out' }, 2.55)
+      .to(st, { press: 1, duration: 0.45, ease: 'back.out(2.6)' }, 2.68)
       .to(st, { touch: 0, duration: 0.35, ease: 'power1.out' }, 2.72)
-      .to(st, { open: 1, duration: 0.62, ease: 'power3.inOut' }, 2.72);
+      .to(st, { open: 1, duration: 0.58, ease: 'sb.launch' }, 2.7);
     let at = 4.1;
-    const coverShots = canUnfold ? Math.min(2, app.shots) : app.shots;
+    const coverShots = site ? (sitePhone || !canUnfold ? SITE_STEPS : 0) : canUnfold ? Math.min(2, app.shots) : app.shots;
     for (let i = 1; i <= coverShots; i++) {
-      loop.to(st, { slide: i, duration: 0.72, ease: 'power3.inOut' }, at);
+      loop.to(st, { slide: i, duration: 0.7, ease: 'sb.flick' }, at);
       at += 2.3;
     }
     if (canUnfold) {
-      // unfold on the model's own hinge animation, turning to the inner screen
-      loop.to(st, { fold: 1, duration: 2.1, ease: 'power2.inOut' }, at - 0.3);
-      loop.set(st, { open: 0, slide: 0, jiggle: 1 }, at + 1); // the cover screen resets while it faces away
-      at += 2.6;
-      const steps = Math.min(3, Math.max(1, app.shots - 1));
+      // Unfold on the model's own hinge: the camera makes room first, the hinge swings open, the hand turns the
+      // phone to face you a beat behind it, and the phone gives a small damped wobble as the hinge locks flat.
+      const u = at - 0.3;
+      loop
+        .to(st, { zoom: 1, duration: 2.2, ease: 'power2.inOut' }, u - 0.15)
+        .to(st, { fold: 1, duration: 2, ease: 'sb.hingeOpen' }, u)
+        .to(st, { turn: 1, duration: 2.15, ease: 'power3.inOut' }, u + 0.12)
+        .fromTo(st, { wob: 0 }, { wob: 1, duration: 1.2, ease: 'sb.settle', immediateRender: false }, u + 1.82)
+        .set(st, { open: 0, slide: 0, jiggle: 1 }, u + 1.3); // the cover screen resets while it faces away
+      at += 2.8;
+      const steps = site ? SITE_STEPS : Math.min(3, Math.max(1, app.shots - 1));
       for (let i = 1; i <= steps; i++) {
-        loop.to(st, { inner: i, duration: 0.85, ease: 'power3.inOut' }, at);
+        loop.to(st, { inner: i, duration: 0.8, ease: 'sb.flick' }, at);
         at += 2.3;
       }
-      // fold shut, back to the cover screen's home screen
-      loop.to(st, { fold: 0, duration: 1.9, ease: 'power2.inOut' }, at - 0.4);
-      loop.set(st, { inner: 0 }, at + 1.6);
-      loop.to({}, { duration: 1.4 }, at + 1.6);
+      // Fold shut: it turns back as it closes, the magnets snap the last few degrees, and it settles in the hand.
+      const f = at - 0.4;
+      loop
+        .to(st, { turn: 0, duration: 1.95, ease: 'power3.inOut' }, f)
+        .to(st, { fold: 0, duration: 1.8, ease: 'sb.hingeShut' }, f + 0.1)
+        .to(st, { zoom: 0, duration: 2.1, ease: 'power2.inOut' }, f + 0.15)
+        .fromTo(st, { wob: 0 }, { wob: -0.6, duration: 0.9, ease: 'sb.settle', immediateRender: false }, f + 1.88)
+        .set(st, { inner: 0 }, f + 2.1)
+        .to({}, { duration: 1.4 }, f + 2.1);
     } else {
       loop
         .to(st, { open: 0, duration: 0.6, ease: 'power3.inOut' }, at)
@@ -726,15 +864,21 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
   }
 
   /* ---------- pointer parallax ---------- */
-  const target = { x: 0, y: 0 };
+  // The phone leans towards the cursor with a little weight (time-based, so it feels the same at any frame
+  // rate) and drifts back to rest when the cursor leaves.
   const zone = host.parentElement ?? host;
+  const tiltX = gsap.quickTo(rig.rotation, 'x', { duration: 0.9, ease: 'power3.out' });
+  const tiltY = gsap.quickTo(rig.rotation, 'y', { duration: 0.9, ease: 'power3.out' });
   const onMove = (e: PointerEvent) => {
     if (e.pointerType !== 'mouse') return;
     const r = zone.getBoundingClientRect();
-    target.y = (((e.clientX - r.left) / r.width) * 2 - 1) * 0.22;
-    target.x = (((e.clientY - r.top) / r.height) * 2 - 1) * 0.12;
+    tiltY((((e.clientX - r.left) / r.width) * 2 - 1) * 0.22);
+    tiltX((((e.clientY - r.top) / r.height) * 2 - 1) * 0.12);
   };
-  const onLeave = () => ((target.x = 0), (target.y = 0));
+  const onLeave = () => {
+    tiltX(0);
+    tiltY(0);
+  };
   zone.addEventListener('pointermove', onMove);
   zone.addEventListener('pointerleave', onLeave);
 
@@ -748,7 +892,7 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
     const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     distShut = Math.max((PHONE_H * 1.2) / (2 * tan), (Math.max(phoneW, phoneD) * 1.75) / (2 * tan * camera.aspect));
     distOpen = Math.max((openH * 1.22) / (2 * tan), (openW * 1.3) / (2 * tan * camera.aspect));
-    camera.position.z = THREE.MathUtils.lerp(distShut, distOpen, st.fold);
+    camera.position.z = THREE.MathUtils.lerp(distShut, distOpen, st.zoom);
     camera.position.y = -0.02;
     camera.updateProjectionMatrix();
   };
@@ -758,23 +902,43 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
   ro.observe(host);
   resize();
 
-  let raf = 0;
+  // Frames run on GSAP's own ticker, straight after it updates the tweens, so every frame renders exactly the
+  // state GSAP just computed (a separate requestAnimationFrame can land a frame behind and judder).
+  // The screen canvases are redrawn, and re-uploaded to the GPU, only when what they show has changed.
   let active = false;
   let started = false;
   const t0 = performance.now();
+  const loaded = () =>
+    [sitePhone, siteWide].reduce((n, img) => n + (img && ready(img) ? 1 : 0), shots.reduce((n, img) => n + (ready(img) ? 1 : 0), ready(icon) ? 1 : 0));
+  let coverKey = '';
+  let innerKey = '';
   const tick = () => {
-    raf = requestAnimationFrame(tick);
     const t = (performance.now() - t0) / 1000;
-    rig.rotation.x += (target.x - rig.rotation.x) * 0.06;
-    rig.rotation.y += (target.y - rig.rotation.y) * 0.06;
     shadowMat.opacity = 0.85 - phone.position.y * 1.5;
     if (canUnfold) {
-      applyFold(st.fold);
-      camera.position.z = THREE.MathUtils.lerp(distShut, distOpen, st.fold);
-      shadow.scale.x = THREE.MathUtils.lerp(1, openW / phoneW, st.fold);
+      applyFold(st.fold, st.turn);
+      camera.position.z = THREE.MathUtils.lerp(distShut, distOpen, st.zoom);
+      shadow.scale.x = THREE.MathUtils.lerp(1, openW / phoneW, st.turn);
+      fit.rotation.z = st.wob * 0.028;
+      fit.rotation.y = st.wob * 0.05;
+      fit.position.y = -Math.abs(st.wob) * 0.012;
     }
-    if (st.fold < 0.85) draw(t); // the cover screen, while it can be seen
-    if (st.fold > 0.15) drawInner();
+    const n = loaded();
+    if (st.fold < 0.85) {
+      // the cover screen, while it can be seen; the jiggling home screen changes every frame
+      const k = `${st.open},${st.slide},${st.press},${st.touch},${st.jiggle},${n}`;
+      if (k !== coverKey || (st.jiggle > 0 && st.open < 1)) {
+        coverKey = k;
+        draw(t);
+      }
+    }
+    if (st.fold > 0.15) {
+      const k = `${st.inner},${n}`;
+      if (k !== innerKey) {
+        innerKey = k;
+        drawInner();
+      }
+    } else innerKey = '';
     renderer.render(scene, camera);
   };
   draw(0);
@@ -789,17 +953,17 @@ export async function mountPhone(host: HTMLElement, app: PhoneApp, opts: { reduc
           started = true;
           anims.forEach((a) => a.play());
         } else anims.forEach((a) => a.resume());
-        raf = requestAnimationFrame(tick);
+        gsap.ticker.add(tick);
       } else {
-        cancelAnimationFrame(raf);
+        gsap.ticker.remove(tick);
         anims.forEach((a) => a.pause());
       }
     },
     dispose() {
-      cancelAnimationFrame(raf);
+      gsap.ticker.remove(tick);
       ro.disconnect();
       anims.forEach((a) => a.kill());
-      gsap.killTweensOf([phone.position, phone.rotation, phone.scale, st]);
+      gsap.killTweensOf([phone.position, phone.rotation, phone.scale, rig.rotation, st]);
       zone.removeEventListener('pointermove', onMove);
       zone.removeEventListener('pointerleave', onLeave);
       mixer?.stopAllAction();

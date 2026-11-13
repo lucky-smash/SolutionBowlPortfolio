@@ -54,7 +54,7 @@ export default function LivePhone({ app, poster = 1, className = '' }: { app: Ph
       <div
         className={`pointer-events-none absolute left-1/2 top-1/2 aspect-[0.78] h-[62%] -translate-x-1/2 -translate-y-1/2 -rotate-[4deg] rounded-[10%/8%] bg-[#2a2b30] p-[2.6%] shadow-[0_30px_50px_-20px_rgb(0_0_0/0.6)] transition-opacity duration-700 ${ready ? 'opacity-0' : 'opacity-100'}`}
       >
-        <img src={`/img/apps/${app.id}/s${poster}.webp`} alt="" className="size-full rounded-[8%/6%] bg-[#fff] object-cover object-top" loading="lazy" />
+        <img src={app.site ? (app.site.phone ?? app.site.wide) : `/img/apps/${app.id}/s${poster}.webp`} alt="" className="size-full rounded-[8%/6%] bg-[#fff] object-cover object-top" loading="lazy" />
       </div>
     </div>
   );

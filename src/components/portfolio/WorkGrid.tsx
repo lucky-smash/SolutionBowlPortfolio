@@ -4,13 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
-import { appPreviews, type AppPreview, type Project } from '@/content/projects';
+import { appPreviews, kindFilters, sectorOrder, type AppPreview, type Kind, type Project, type Sector } from '@/content/projects';
 import { EASE, reducedMotion } from '@/lib/motion';
 import { Arrow } from '@/components/chrome/Nav';
 import CoverReveal from './CoverReveal';
 import LivePhone from './LivePhone';
 
-const FILTERS = ['All Projects', 'FinTech', 'Healthcare', 'E-Commerce', 'Real Estate', 'Mobile Apps', 'Enterprise'] as const;
+type KindFilter = Kind | 'All';
+type SectorFilter = Sector | 'All';
 
 /**
  * The editorial index of all projects. Cards take varied sizes in a 12-column rhythm (wide / narrow, a row of
@@ -20,14 +21,20 @@ const FILTERS = ['All Projects', 'FinTech', 'Healthcare', 'E-Commerce', 'Real Es
 const RHYTHM = [7, 5, 4, 4, 4, 5, 7, 6, 6];
 
 export default function WorkGrid({ projects }: { projects: Project[] }) {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All Projects');
+  const [kind, setKind] = useState<KindFilter>('All');
+  const [sector, setSector] = useState<SectorFilter>('All');
   const grid = useRef<HTMLUListElement>(null);
   const first = useRef(true);
+
+  const inKind = projects.filter((p) => kind === 'All' || p.kind === kind);
+  // Industries offered under the current capsule: only those with at least one project in it.
+  const sectors = sectorOrder.filter((s) => inKind.some((p) => p.sectors.includes(s)));
+  const activeSector = sector !== 'All' && sectors.includes(sector) ? sector : 'All';
   // Apps lead the grid (and every filtered view); the rest keep their order.
-  const shown = projects
-    .filter((p) => filter === 'All Projects' || p.sectors.includes(filter as Project['sector']))
+  const shown = inKind
+    .filter((p) => activeSector === 'All' || p.sectors.includes(activeSector))
     .sort((a, b) => Number(b.id in appPreviews) - Number(a.id in appPreviews));
-  const counts = Object.fromEntries(FILTERS.map((f) => [f, f === 'All Projects' ? projects.length : projects.filter((p) => p.sectors.includes(f as Project['sector'])).length]));
+  const kinds = kindFilters.filter((k) => projects.some((p) => p.kind === k.kind));
 
   useEffect(() => {
     if (first.current) {
@@ -36,23 +43,45 @@ export default function WorkGrid({ projects }: { projects: Project[] }) {
     }
     if (!grid.current || reducedMotion()) return;
     animate(grid.current.children, { opacity: [0, 1], translateY: [40, 0], scale: [0.97, 1], duration: 900, delay: stagger(60), ease: EASE.out });
-  }, [filter]);
+  }, [kind, activeSector]);
+
+  const pickKind = (k: KindFilter) => {
+    setKind(k);
+    setSector('All');
+  };
 
   return (
     <div>
-      <div role="group" aria-label="Filter projects by sector" className="flex flex-wrap gap-2">
-        {FILTERS.filter((f) => counts[f] > 0).map((f) => (
+      <div role="group" aria-label="Filter projects by type" className="flex flex-wrap gap-2">
+        {([{ kind: 'All', label: 'All Projects' }, ...kinds] as { kind: KindFilter; label: string }[]).map((k) => (
           <button
-            key={f}
+            key={k.kind}
             type="button"
-            aria-pressed={filter === f}
-            onClick={() => setFilter(f)}
-            className={`tag py-2.5 text-sm transition-colors ${filter === f ? 'bg-ink text-paper' : 'border border-[var(--line-strong)] bg-paper hover:bg-cream-2'}`}
+            aria-pressed={kind === k.kind}
+            onClick={() => pickKind(k.kind)}
+            className={`tag py-2.5 text-sm transition-colors ${kind === k.kind ? 'bg-ink text-paper' : 'border border-[var(--line-strong)] bg-paper hover:bg-cream-2'}`}
           >
-            {f}
+            {k.label}
           </button>
         ))}
       </div>
+      {sectors.length > 1 && (
+        <div role="group" aria-label="Filter by industry" className="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2">
+          {(['All', ...sectors] as SectorFilter[]).map((s) => (
+            <button
+              key={s}
+              type="button"
+              aria-pressed={activeSector === s}
+              onClick={() => setSector(s)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                activeSector === s ? 'bg-orange text-ink' : 'text-ink-2 hover:bg-cream-2 hover:text-ink'
+              }`}
+            >
+              {s === 'All' ? 'All' : s}
+            </button>
+          ))}
+        </div>
+      )}
       <p className="sr-only" aria-live="polite">
         {shown.length} projects shown
       </p>

@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 import Footer from '@/components/chrome/Footer';
+import OrangeToggle from '@/components/chrome/OrangeToggle';
 import MotionRoot from '@/components/motion/MotionRoot';
 import PageCurtain from '@/components/motion/PageCurtain';
 import JsonLd from '@/components/seo/JsonLd';
@@ -45,7 +46,7 @@ export const viewport: Viewport = {
 // Dark is the default and is in the server HTML, so first paint (and no-JS) is dark. Runs before first paint:
 // marks JS as available (so entrance states apply only when they will be animated) and honours a visitor who
 // chose the light theme, so a light page never flashes dark.
-const boot = `document.documentElement.classList.add('js');try{if(localStorage.getItem('sb-theme')==='light')delete document.documentElement.dataset.theme}catch(e){}`;
+const boot = `document.documentElement.classList.add('js');try{if(localStorage.getItem('sb-theme')==='light')delete document.documentElement.dataset.theme;var o=localStorage.getItem('sb-orange');if(o==='logo'||o==='brand')document.documentElement.dataset.orange=o}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -63,6 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <main id="main">{children}</main>
         <Footer />
+        {/* Trial: compare the site orange with the logo orange. Remove once one is chosen. */}
+        <OrangeToggle className="fixed bottom-4 left-4 z-[90] shadow-lg" />
         <MotionRoot />
         <PageCurtain />
       </body>

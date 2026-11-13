@@ -104,10 +104,11 @@ export default function Stage({ className = '' }: { className?: string }) {
       const vw = box.width / s;
       const vh = box.height / s;
       root.setAttribute('viewBox', `${(W - vw).toFixed(1)} ${(H - vh).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
-      // Passers-by enter only to the right of anything in their band.
+      // Passers-by cross the whole visible width below the copy, from the left edge of the page; anything that
+      // reaches down into their band pushes their entry point to its right.
       const bandTop = box.bottom - (H - (GROUND - 170)) * s;
       const edge = Math.max(box.left, ...avoid.filter((o) => o.bottom > bandTop - GAP).map((o) => o.right + GAP));
-      span[0] = Math.max(760, W - (box.right - edge) / s);
+      span[0] = W - (box.right - edge) / s;
     };
     const g = cast.current!;
 
@@ -162,14 +163,16 @@ export default function Stage({ className = '' }: { className?: string }) {
     const ro = new ResizeObserver(() => fit());
     if (section) ro.observe(section);
 
-    // Depth: two small, muted passers-by crossing the back of the scene in opposite directions. They travel at
-    // exactly stride / period, so their feet stay planted while they move.
+    // Depth: small, muted passers-by crossing the back of the scene in both directions, filling the open ground
+    // under the copy. They travel at exactly stride / period, so their feet stay planted while they move.
     const back = root.querySelector<SVGGElement>('#st-back')!;
     const passers = narrow
       ? []
       : [
           { f: new Figure(back, { ...B, height: 150, hair: 'bun', skin: 'skin-b', jacket: 'f-grey', trousers: 'f-dark', trouserCut: 'slim', shoes: 'sneaker-light', period: 1.3, phase: 0.2 }), dir: 1, x0: 120, y: GROUND - 18 },
           { f: new Figure(back, { ...A, height: 132, hair: 'bob', glasses: false, skin: 'skin-a', jacket: 'f-main', trousers: 'f-light', period: 1.22, phase: 0.6 }), dir: -1, x0: 760, y: GROUND - 40 },
+          { f: new Figure(back, { ...A, height: 142, hair: 'curls', glasses: false, skin: 'skin-c', jacket: 'f-light', trousers: 'f-main', trouserCut: 'flare', shoes: 'sneaker-dark', period: 1.16, phase: 0.45 }), dir: 1, x0: -300, y: GROUND - 26 },
+          { f: new Figure(back, { ...B, height: 124, hair: 'quiff', glasses: true, skin: 'skin-b', jacket: 'f-grey', trousers: 'f-dark', trouserCut: 'slim', shoes: 'sneaker-light', period: 1.26, phase: 0.85 }), dir: -1, x0: 1350, y: GROUND - 48 },
         ];
     // Passers-by stay right of the copy (span, set by fit) and fade in / out at the ends of their path.
     const movePassers = (t: number) =>
@@ -279,8 +282,8 @@ export default function Stage({ className = '' }: { className?: string }) {
           <feDropShadow in="torn" dx="2" dy="3" stdDeviation="1.6" floodColor="#5a2a0e" floodOpacity="0.28" />
         </filter>
         <pattern id="st-hatch-orange" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(32)">
-          <rect width="7" height="7" fill="#f9b27a" />
-          <path d="M0 1.5H7M0 5H7" stroke="#e8641f" strokeWidth="2.1" />
+          <rect width="7" height="7" style={{ fill: "color-mix(in oklab, var(--color-orange), white 45%)" }} />
+          <path d="M0 1.5H7M0 5H7" style={{ stroke: "color-mix(in oklab, var(--color-orange), black 6%)" }} strokeWidth="2.1" />
         </pattern>
         <pattern id="st-hatch-ink" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-28)">
           <rect width="6" height="6" fill="#6a625b" />
@@ -298,16 +301,16 @@ export default function Stage({ className = '' }: { className?: string }) {
           <rect x="3" y="2" width="1" height="1" fill="#4a423c" />
         </pattern>
         <pattern id="st-grain-orange" width="4" height="4" patternUnits="userSpaceOnUse">
-          <rect width="4" height="4" fill="#ec6a24" />
-          <rect x="1" y="0" width="1" height="1" fill="#ffb07a" />
-          <rect x="3" y="2" width="1" height="1" fill="#c94f12" />
-          <rect x="0" y="3" width="1" height="1" fill="#f99052" />
+          <rect width="4" height="4" style={{ fill: "color-mix(in oklab, var(--color-orange), black 4%)" }} />
+          <rect x="1" y="0" width="1" height="1" style={{ fill: "color-mix(in oklab, var(--color-orange), white 40%)" }} />
+          <rect x="3" y="2" width="1" height="1" style={{ fill: "color-mix(in oklab, var(--color-orange), black 20%)" }} />
+          <rect x="0" y="3" width="1" height="1" style={{ fill: "color-mix(in oklab, var(--color-orange), white 18%)" }} />
         </pattern>
         <style>{STAGE_CSS}</style>
       </defs>
 
       {/* A network flourish, from the molecule cluster in the SB logo: one sweeping line threading three nodes. */}
-      <g className="flourish" fill="none" stroke="#f58634" strokeLinecap="round">
+      <g className="flourish" fill="none" style={{ stroke: "var(--color-orange)" }} strokeLinecap="round">
         <path d="M1840 -140 L1660 -20 C1540 60 1350 70 1330 210 C1310 350 1520 330 1560 470 C1590 570 1500 640 1420 700" strokeWidth="17" />
         <circle cx="1331" cy="205" r="34" strokeWidth="15" fill="var(--color-cream)" />
         <circle cx="1556" cy="455" r="22" strokeWidth="13" fill="var(--color-cream)" />
@@ -326,16 +329,16 @@ const STAGE_CSS = `
 .stage .line{fill:none}
 .stage .ground-shadow{fill:#1c1916;opacity:.08}
 .stage .shade{filter:brightness(.86)}
-.stage .f-main{fill:#f58634}.stage .f-dark{fill:#2a2623}.stage .f-light{fill:#fffaf2}.stage .f-paper{fill:#fffdf8}.stage .f-grey{fill:#a7a9ab}
+.stage .f-main{fill:var(--color-orange)}.stage .f-dark{fill:#2a2623}.stage .f-light{fill:#fffaf2}.stage .f-paper{fill:#fffdf8}.stage .f-grey{fill:#a7a9ab}
 .stage .skin-a{fill:#f2c9a6}.stage .skin-b{fill:#d49a70}.stage .skin-c{fill:#8d5a3b}
 .stage .hair{fill:#2a1f18}.stage .lens{fill:#1c1916}
 .stage .sneaker-dark{fill:#1c1916}.stage .sneaker-light{fill:#fffaf2}.stage .sole{fill:#fffaf2}
 .stage .collar{filter:brightness(.92)}
 .stage .ink-mark{fill:#1c1916}.stage .mark-o{fill:#f58634}.stage .mark-g{fill:#848688}
 .stage .flow-tangle{fill:none;stroke:#1c1916;stroke-width:3}
-.stage .flow-done{fill:none;stroke:#e35a12;stroke-width:5;stroke-linecap:round}
+.stage .flow-done{fill:none;stroke:color-mix(in oklab, var(--color-orange), black 10%);stroke-width:5;stroke-linecap:round}
 .stage .node{fill:#fffdf8;stroke:#1c1916;stroke-width:2.6}
-.stage .node-end{fill:#f58634;stroke:#1c1916;stroke-width:2.6}
+.stage .node-end{fill:var(--color-orange);stroke:#1c1916;stroke-width:2.6}
 .stage .tick{fill:none;stroke:#1c1916;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 
 .stage[data-style=pencil] .ol{stroke:#3a2f28;stroke-width:1.7}
@@ -352,12 +355,12 @@ const STAGE_CSS = `
 
 .stage[data-style=paper] .ol{stroke:none}
 .stage[data-style=paper] #st-cast{filter:url(#st-paper)}
-.stage[data-style=paper] .f-main{fill:#e8561c}.stage[data-style=paper] .f-light{fill:#f6e4d2}.stage[data-style=paper] .f-paper{fill:#fbefe2}
+.stage[data-style=paper] .f-main{fill:color-mix(in oklab, var(--color-orange), black 8%)}.stage[data-style=paper] .f-light{fill:#f6e4d2}.stage[data-style=paper] .f-paper{fill:#fbefe2}
 .stage[data-style=paper] .hair{fill:#3b2a20}.stage[data-style=paper] .line{stroke:#1c1916;stroke-width:2.4}
 .stage[data-style=paper] .flow-tangle{stroke:#1c1916}
 .stage .flourish{opacity:.95}
 .stage .back{opacity:.5}
-.stage .back .f-main{fill:#f7b98a}.stage .back .f-dark{fill:#8a8178}.stage .back .f-grey{fill:#c9c2b8}.stage .back .f-light{fill:#fffaf2}
+.stage .back .f-main{fill:color-mix(in oklab, var(--color-orange), white 45%)}.stage .back .f-dark{fill:#8a8178}.stage .back .f-grey{fill:#c9c2b8}.stage .back .f-light{fill:#fffaf2}
 .stage .back .ol{stroke-width:2}
 `;
 
